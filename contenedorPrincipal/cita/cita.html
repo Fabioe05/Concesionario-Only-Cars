@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendar Cita | Only Cars</title>
+    <link rel="stylesheet" href="../index.css">
+    <link rel="stylesheet" href="./cita.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a href="../index.html" class="logo">Only<span>Cars</span></a>
+        <ul class="nav-links">
+            <li><a href="../marcas/marcas.html">Marcas</a></li>
+            <li><a href="../vendedores/vendedor.html">Quiénes Somos</a></li>
+        </ul>
+    </nav>
+
+    <main class="cita-container">
+        <div class="cita-card">
+            <header class="cita-header">
+                <span class="subtitle">ATENCIÓN PERSONALIZADA</span>
+                <h2>Agendar Cita en Agencia</h2>
+            </header>
+
+            <form id="cita-form">
+                <!-- Selector con Buscador (Construido para JS) -->
+                <div class="form-group">
+                    <label>Vehículo de Interés *</label>
+                    <div class="custom-select" id="custom-select">
+                        <div class="select-trigger">
+                            <span id="selected-vehicle">Seleccione un vehículo...</span>
+                            <span class="arrow">▼</span>
+                        </div>
+
+                        <div class="options-container" id="options-container">
+                            <div class="search-box-select">
+                                <input type="text" id="search-input" placeholder="Buscar modelo o marca...">
+                            </div>
+                            <ul class="options-list" id="options-list">
+                                <li data-value="Ferrari SF90 Stradale (2025)">Ferrari SF90 Stradale (2025) - $520,000
+                                </li>
+                                <li data-value="Ferrari 296 GTB (2025)">Ferrari 296 GTB (2025) - $338,000</li>
+                                <li data-value="Ferrari F8 Tributo (2024)">Ferrari F8 Tributo (2024) - $280,000</li>
+                                <li data-value="Porsche 911 GT3 RS (2025)">Porsche 911 GT3 RS (2025) - $290,000</li>
+                                <li data-value="Lamborghini Revuelto (2025)">Lamborghini Revuelto (2025) - $600,000</li>
+                                <li data-value="Maserati MC20 (2024)">Maserati MC20 (2024) - $220,000</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- Input oculto para enviar el dato real en un formulario -->
+                    <input type="hidden" name="vehiculo" id="hidden-vehicle" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Fecha y Hora Preferida *</label>
+                    <input type="datetime-local" name="fecha_hora" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Notas adicionales (Opcional)</label>
+                    <textarea rows="4"
+                        placeholder="Ej: Deseo prueba de manejo, ver paquete de carbono, etc."></textarea>
+                </div>
+
+                <div class="cita-actions">
+                    <button type="button" class="btn-outline">Cancelar</button>
+                    <button type="submit" class="btn-primary">Confirmar Solicitud de Cita</button>
+                </div>
+            </form>
+        </div>
+    </main>
+    <footer>
+        <div class="footer-bottom">
+            <p>Desarrollado por <a href="https://github.com/Fabioe05" target="_blank">Fabio Espinoza</a></p>
+        </div>
+    </footer>
+
+    <!-- Enlazamos el archivo JavaScript -->
+    <script src="./cita.js"></script>
+</body>
+
+</html>

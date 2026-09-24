@@ -1,0 +1,150 @@
+/* ==========================================
+   ESTILOS EXCLUSIVOS - VISTA DETALLE VEHÍCULO
+   ========================================== */
+
+.vehicle-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.vehicle-title {
+  font-family: var(--font-title);
+  font-size: 2.5rem;
+  font-style: italic;
+  letter-spacing: 2px;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.vehicle-subtitle {
+  color: var(--accent-yellow);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 0.9rem;
+}
+
+/* Pasarela de fotos */
+.gallery-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.main-photo {
+  width: 100%;
+  height: 420px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--accent-red);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.thumbnails-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.thumb {
+  height: 100px;
+  background-color: #1c1c21;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.thumb:hover {
+  border-color: var(--accent-red);
+  transform: translateY(-2px);
+}
+
+/* Caja de Información */
+.info-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 2.5rem;
+  margin-bottom: 3rem;
+}
+
+.info-box h2 {
+  font-family: var(--font-title);
+  font-style: italic;
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.specs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.spec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  background: var(--bg-input);
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius);
+  border-left: 3px solid var(--border-color);
+}
+
+.spec-item:hover {
+  border-left-color: var(--accent-red);
+}
+
+.spec-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+.spec-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.highlight-price {
+  color: var(--accent-yellow);
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+}
+
+.vehicle-description p {
+  color: var(--text-muted);
+  line-height: 1.8;
+  font-size: 0.95rem;
+}
+
+/* CTA */
+.cta-container {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.btn-large {
+  padding: 1rem 3rem;
+  font-size: 0.95rem;
+}

@@ -1,0 +1,155 @@
+/* Estilos específicos para el catálogo por marcas */
+
+.brand-title {
+  font-family: var(--font-title);
+  font-size: 2.8rem;
+  font-style: italic;
+  text-align: center;
+  letter-spacing: 3px;
+  color: var(--accent-red);
+  margin-bottom: 2rem;
+}
+
+.search-box {
+  display: flex;
+  max-width: 600px;
+  margin: 0 auto 3.5rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.search-box:focus-within {
+  border-color: var(--accent-red);
+}
+
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 1rem 1.2rem;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.search-btn {
+  background: transparent;
+  border: none;
+  padding: 0 1.5rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: color 0.2s;
+}
+
+.search-btn:hover {
+  color: var(--accent-red);
+}
+
+.grid-6 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.8rem;
+  margin-bottom: 4rem;
+}
+
+/* =========================================
+   ESTILOS PARA LA SECCIÓN DE MARCAS Y MODELOS
+   ========================================= */
+
+#seccion-marcas,
+#seccion-modelos {
+  padding: 40px 5%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 1. Grilla corregida: Fuerza exactamente 3 columnas para un formato 3x3 perfecto */
+.grid-marcas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  margin-top: 40px;
+}
+
+/* Diseño de cada caja de marca */
+.brand-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1f2c44;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 30px 20px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: 1px solid #2a3b5c;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* 2. Efecto hover corregido a ROJO */
+.brand-item:hover {
+  background-color: #d32f2f; /* Rojo intenso y elegante */
+  color: white;
+  transform: translateY(-5px);
+  border-color: #d32f2f;
+}
+
+/* 3. Centrado del botón de Contacto / Agendar Cita */
+/* IMPORTANTE: Asegúrate de que tu botón en el HTML tenga esta clase (.btn-contacto) */
+.btn-contacto {
+  display: block;
+  width: fit-content;
+  margin: 40px auto 0 auto; /* El "auto" a los lados lo centra perfectamente en la pantalla */
+  text-align: center;
+  /* Si ya tienes estilos para el botón (fondo, padding), ponlos aquí o mantén tu clase original junto con esta */
+}
+
+/* Espaciado para el encabezado cuando entras a una marca */
+.header-modelos {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 20px;
+}
+
+.header-modelos h1 {
+  margin: 0;
+  font-size: 2rem;
+  text-transform: uppercase;
+}
+
+.btn-outline {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: 0.3s;
+}
+
+.btn-outline:hover {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Responsividad: Para que la grilla 3x3 no se aplaste en pantallas pequeñas */
+@media (max-width: 900px) {
+  .grid-marcas {
+    grid-template-columns: repeat(2, 1fr); /* Baja a 2 columnas en tablets */
+  }
+}
+@media (max-width: 600px) {
+  .grid-marcas {
+    grid-template-columns: 1fr; /* Baja a 1 columna en celulares */
+  }
+}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle del Vehículo | Only Cars</title>
+    <link rel="stylesheet" href="../index.css">
+    <link rel="stylesheet" href="./vehiculo.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a href="../index.html" class="logo">Only<span>Cars</span></a>
+        <ul class="nav-links">
+            <li><a href="../marcas/marcas.html">Marcas</a></li>
+            <li><a href="../vendedores/vendedor.html">Quiénes Somos</a></li>
+        </ul>
+        <div class="nav-auth">
+            <a href="../registro/registro.html" class="btn-outline">Registro</a>
+            <a href="../login/login.html" class="btn-outline">Login</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <header class="vehicle-header">
+            <h1 id="vehicle-title"></h1>
+        </header>
+
+        <section class="gallery-container">
+            <div class="main-photo">
+                <span>PASARELA DE FOTOS (FOTO PRINCIPAL)</span>
+            </div>
+            <div class="thumbnails-grid">
+                <div class="thumb">FOTO 1</div>
+                <div class="thumb">FOTO 2</div>
+                <div class="thumb">FOTO 3</div>
+                <div class="thumb">FOTO 4</div>
+            </div>
+        </section>
+
+        <section class="info-box">
+            <h2>Información Técnica & Especificaciones</h2>
+            <div class="specs-grid">
+                <div class="spec-item">
+                    <span class="spec-label">Motor</span>
+                    <span id="vehicle-motor" class="spec-value"></span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Estatus</span>
+                    <span id="vehicle-status" class="spec-value"></span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Transmisión</span>
+                    <span id="vehicle-transmission" class="spec-value"></span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Numero de dueños</span>
+                    <span id="vehicle-owners" class="spec-value"></span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Año</span>
+                    <span id="vehicle-year" class="spec-value"></span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Precio</span>
+                    <span id="vehicle-price" class="spec-value highlight-price"></span>
+                </div>
+            </div>
+
+            <div class="vehicle-description">
+                <p>
+                    El Ferrari SF90 Stradale redefine los límites del rendimiento de superdeportivos. Equipado con
+                    arquitectura híbrida de última generación, tracción total e ingeniería derivada directamente de la
+                    Scuderia de Fórmula 1.
+                </p>
+            </div>
+        </section>
+
+        <div class="cta-container">
+            <a href="../cita/cita.html" class="btn-primary btn-large">Contacto / Agendar Cita</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-bottom">
+            <p>Desarrollado por <a href="https://github.com/Fabioe05" target="_blank">Fabio Espinoza</a></p>
+        </div>
+    </footer>
+
+    <script src="./vehiculo.js"></script>
+
+</body>
+
+</html>

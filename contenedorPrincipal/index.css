@@ -1,0 +1,548 @@
+/* ==========================================
+   ESTILOS UNIFICADOS - CONCEPTO FERRARI
+   ========================================== */
+
+/* 1. VARIABLES & RESET */
+:root {
+  --bg-main: #0b0b0d;
+  --bg-card: #151518;
+  --bg-input: #1e1e22;
+  --accent-red: #d40000;
+  --accent-red-hover: #b00000;
+  --accent-yellow: #ffeb00;
+  --text-primary: #f5f5f7;
+  --text-muted: #8e8e93;
+  --border-color: #26262c;
+  --radius: 4px;
+  --font-title: "Arial Black", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+/* 2. NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 4rem;
+  background-color: rgba(11, 11, 13, 0.95);
+  border-bottom: 2px solid var(--accent-red);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-family: var(--font-title);
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--text-primary);
+  text-decoration: none;
+  text-transform: uppercase;
+  font-style: italic;
+}
+
+.logo span {
+  color: var(--accent-red);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--accent-red);
+}
+
+/* 3. BOTONES */
+.btn-primary {
+  background: var(--accent-red);
+  color: #ffffff;
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 0.8rem;
+  transition: all 0.2s ease-in-out;
+  display: inline-block;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(212, 0, 0, 0.3);
+}
+
+.btn-primary:hover {
+  background: var(--accent-red-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 0, 0, 0.5);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 0.8rem 2rem;
+  border-radius: var(--radius);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 0.8rem;
+  transition: all 0.3s;
+}
+
+.btn-outline:hover {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+/* 4. LAYOUT Y TITULOS */
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.section-title {
+  font-family: var(--font-title);
+  font-size: 1.8rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 2.5rem;
+  text-align: center;
+  font-style: italic;
+  position: relative;
+}
+
+.section-title::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: var(--accent-red);
+  margin: 0.6rem auto 0;
+}
+
+/* 5. HERO / PANEL INICIAL (HOME) */
+.hero-slider {
+  width: 100%;
+  height: 480px;
+  background: linear-gradient(180deg, #151518 0%, #0b0b0d 100%);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--accent-red);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4rem;
+  position: relative;
+}
+
+.hero-content {
+  text-align: center;
+  background: rgba(11, 11, 13, 0.85);
+  padding: 3rem 5rem;
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(5px);
+}
+
+.hero-content h1 {
+  font-family: var(--font-title);
+  font-size: 2.5rem;
+  letter-spacing: 3px;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+}
+
+.hero-content p {
+  color: var(--accent-yellow);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 0.85rem;
+}
+
+/* 6. GRIDS & TARJETAS DE OFERTAS */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent-red);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+}
+
+.card-img {
+  width: 100%;
+  height: 200px;
+  background-color: #1c1c21;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-weight: 700;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.card-body {
+  padding: 1.75rem;
+}
+
+.card-price {
+  color: #ffffff;
+  font-family: var(--font-title);
+  font-size: 1.4rem;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+.card-text {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  margin-bottom: 1.5rem;
+}
+
+/* 7. SECCIÓN MARCAS */
+.grid-brands {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  margin-bottom: 4rem;
+}
+
+.brand-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 1.5rem;
+  text-align: center;
+  text-decoration: none;
+  border-radius: var(--radius);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+}
+
+.brand-item:hover {
+  background: var(--accent-red);
+  border-color: var(--accent-red);
+  color: #ffffff;
+  transform: scale(1.02);
+}
+
+/* 8. SECCIÓN HISTORIA Y EQUIPO */
+.info-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3.5rem;
+  align-items: center;
+  background: var(--bg-card);
+  padding: 3.5rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+  border-right: 4px solid var(--accent-yellow);
+}
+
+.banner-img {
+  width: 100%;
+  height: 280px;
+  background: #1c1c21;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-weight: 700;
+  border: 1px solid var(--border-color);
+}
+
+.info-text h2 {
+  font-family: var(--font-title);
+  font-size: 1.8rem;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+.info-text p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+/* 9. FOOTER */
+footer {
+  background: #050506;
+  border-top: 1px solid var(--border-color);
+  padding: 3rem 1.5rem 1.5rem;
+  margin-top: 5rem;
+}
+
+.footer-info {
+  max-width: 1240px;
+  margin: 0 auto 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.footer-info h3 {
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  color: var(--accent-yellow);
+  margin-bottom: 0.5rem;
+}
+
+.footer-bottom {
+  border-top: 1px solid var(--border-color);
+  padding-top: 1.5rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ==========================================
+   SECCIÓN DE AGENDAR CITA
+   ========================================== */
+
+/* Layout y Tarjeta Principal */
+.cita-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.cita-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-top: 4px solid var(--accent-red);
+  border-radius: var(--radius);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 550px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+}
+
+.cita-header {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.cita-header .subtitle {
+  color: var(--accent-yellow);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.cita-header h2 {
+  font-family: var(--font-title);
+  font-size: 1.6rem;
+  color: #ffffff;
+  margin-top: 0.5rem;
+}
+
+/* Campos de Formulario Base */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.form-group input[type="datetime-local"],
+.form-group textarea {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 0.85rem 1rem;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--accent-red);
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* ==========================================
+   SELECTOR PERSONALIZADO CON BUSCADOR
+   ========================================== */
+.custom-select {
+  position: relative;
+  width: 100%;
+  user-select: none;
+}
+
+.select-trigger {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 0.85rem 1rem;
+  color: #ffffff;
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.custom-select.active .select-trigger {
+  border-color: var(--accent-red);
+}
+
+.select-trigger .arrow {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: transform 0.3s;
+}
+
+.custom-select.active .arrow {
+  transform: rotate(180deg);
+}
+
+/* Contenedor del buscador y las opciones */
+.options-container {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.8);
+  z-index: 100;
+  display: none; /* Oculto por defecto */
+  flex-direction: column;
+}
+
+.custom-select.active .options-container {
+  display: flex; /* Se muestra al activar */
+}
+
+/* Input de búsqueda interno */
+.search-box-select {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.search-box-select input {
+  width: 100%;
+  background: #1c1c21;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.6rem;
+  color: #fff;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.search-box-select input:focus {
+  border-color: var(--accent-yellow);
+}
+
+/* Lista de opciones */
+.options-list {
+  list-style: none;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+}
+
+.options-list li {
+  padding: 0.8rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 1px solid #2a2a35;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.options-list li:last-child {
+  border-bottom: none;
+}
+
+.options-list li:hover {
+  background: #1c1c21;
+  color: #fff;
+}
+
+/* Botones de acción */
+.cita-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.cita-actions button {
+  flex: 1;
+  padding: 0.9rem;
+}

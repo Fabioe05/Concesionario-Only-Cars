@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Catálogo Ferrari | Only Cars</title>
+  <link rel="stylesheet" href="../index.css">
+  <link rel="stylesheet" href="./marcas.css">
+</head>
+
+<body>
+
+  <nav class="navbar">
+    <a href="../index.html" class="logo">Only<span>Cars</span></a>
+    <ul class="nav-links">
+      <li><a href="./marcas.html" class="active">Marcas</a></li>
+      <li><a href="../vendedores/vendedor.html">Quiénes Somos</a></li>
+    </ul>
+    <div class="nav-auth">
+      <a href="../login/login.html" class="btn-outline">Registro / Login</a>
+    </div>
+  </nav>
+  <!-- SECCIÓN 1: Landing de Marcas (Se muestra al hacer clic en MARCAS) -->
+  <section id="seccion-marcas">
+    <h1 class="title">MARCAS</h1>
+    <div class="grid-marcas">
+      <a href="./marcas.html?brand=Kia" class="brand-item">Kia</a>
+      <a href="./marcas.html?brand=Chevrolet" class="brand-item">Chevrolet</a>
+      <a href="./marcas.html?brand=Fiat" class="brand-item">Fiat</a>
+      <a href="./marcas.html?brand=Toyota" class="brand-item">Toyota</a>
+      <a href="./marcas.html?brand=Honda" class="brand-item">Honda</a>
+      <a href="./marcas.html?brand=Hyundai" class="brand-item">Hyundai</a>
+      <a href="./marcas.html?brand=Renault" class="brand-item">Renault</a>
+      <a href="./marcas.html?brand=Volkswagen" class="brand-item">Volkswagen</a>
+      <a href="./marcas.html?brand=BMW" class="brand-item">BMW</a>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 2: Catálogo de Modelos (Se activa al seleccionar una marca) -->
+  <section id="seccion-modelos" style="display: none;">
+    <div class="header-modelos">
+      <a href="./marcas.html" class="btn-outline">← Volver a Marcas</a>
+      <h1 id="brand-title">MODELOS</h1>
+    </div>
+    <div id="vehicles-grid" class="grid-3">
+      <!-- Las tarjetas se generan dinámicamente desde JS -->
+    </div>
+  </section>
+
+  <div class="cita-container">
+    <a href="../cita/cita.html" class="btn-primary">Contacto / Agendar Cita</a>
+  </div>
+
+  <footer>
+    <div class="footer-bottom">
+      <p>Desarrollado por <a href="https://github.com/Fabioe05" target="_blank">Fabio Espinoza</a></p>
+    </div>
+  </footer>
+
+  <script src="./marcas.js"></script>
+
+</body>
+
+</html>
