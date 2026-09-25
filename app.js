@@ -3,13 +3,14 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const Vehiculo = require("./models/Vehiculo");
+const Marca = require("./models/Marca");
 const cors = require("cors");
 const path = require("path");
 
 //middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "contenedorPrincipal")));
+app.use(express.static(path.join(__dirname, "/")));
 
 // Conexión a MongoDB
 (async () => {
@@ -44,12 +45,25 @@ app.get("/api/vehiculos/:id", async (req, res) => {
 });
 
 // 3. Obtener vehículos filtrados por MARCA
+
 app.get("/api/vehiculos/marca/:marca", async (req, res) => {
   try {
-    const marca = req.params.marca;
-    // Búsqueda insensible a mayúsculas/minúsculas
+    const marcaParam = req.params.marca;
+
+    // 1. Primero buscamos el documento de la marca por su texto (ej. "Kia")
+    const marcaEncontrada = await Marca.findOne({
+      name: { $regex: new RegExp(`${marcaParam}$`, "i") }, // Cambia "nombre" si en tu DB de Marcas se llama diferente
+    });
+
+    if (!marcaEncontrada) {
+      return res
+        .status(404)
+        .json({ mensaje: "Marca no registrada en la base de datos" });
+    }
+
+    // 2. Buscamos los vehículos usando el _id exacto de la marca encontrada
     const vehiculos = await Vehiculo.find({
-      marca: { $regex: new RegExp(`${marca}$`, "i") },
+      marca_id: marcaEncontrada._id,
     });
 
     if (vehiculos.length === 0) {

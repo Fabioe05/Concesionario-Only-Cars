@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const vehiculoSchema = new mongoose.Schema(
   {
+    marca_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Marca",
+      required: true,
+    },
     marca: {
       type: String,
       required: [true, "La marca es requerida"],
@@ -63,9 +68,7 @@ const vehiculoSchema = new mongoose.Schema(
         return ret;
       },
     },
-  },
-  { 
-    collection: "Vehiculos" 
+    collection: "Vehiculos",
   },
 );
 

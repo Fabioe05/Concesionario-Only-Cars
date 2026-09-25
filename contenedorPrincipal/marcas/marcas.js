@@ -1,14 +1,7 @@
-// ==========================================
-// 1. SELECTORES DEL DOM
-// ==========================================
 const seccionMarcas = document.getElementById("seccion-marcas");
 const seccionModelos = document.getElementById("seccion-modelos");
 const brandTitle = document.getElementById("brand-title");
 const vehiculosGrid = document.getElementById("vehicles-grid");
-
-// ==========================================
-// 2. FUNCIONES
-// ==========================================
 
 // Obtiene la marca desde los parámetros de la URL (?brand=...)
 function obtenerMarcaURL() {
@@ -18,17 +11,23 @@ function obtenerMarcaURL() {
 
 // Crea la estructura HTML para la tarjeta de un vehículo
 function crearTarjetaVehiculo(vehiculo) {
+  // 1. Obtenemos la marca directamente de la URL usando la función que ya tienes
+  const nombreMarca = obtenerMarcaURL();
+
   const card = document.createElement("div");
   card.className = "card";
+
+  // 2. Usamos 'nombreMarca' en la línea del título en lugar de 'vehiculo.marca'
   card.innerHTML = `
-    <div class="card-img">IMAGEN DE ${vehiculo.modelo}</div>
-    <div class="card-body">
-      <h3 class="card-title">${vehiculo.marca} ${vehiculo.modelo}</h3>
-      <div class="card-price">$${vehiculo.precio.toLocaleString()}</div>
-      <p class="card-text">${vehiculo.transmision} - ${vehiculo.kilometraje} km</p>
-      <a href="vehiculo.html?id=${vehiculo._id}" class="btn-primary" style="width:100%;">Ver Detalle</a>
-    </div>
-  `;
+        <div class="card-img">Imagen de ${vehiculo.modelo}</div>
+        <div class="card-body">
+            <h3 class="card-title">${nombreMarca} ${vehiculo.modelo}</h3>
+            <div class="card-price">$${vehiculo.precio}</div>
+            <p class="card-text">${vehiculo.transmision} - ${vehiculo.motor}</p>
+            <a href="vehiculo.html?id=${vehiculo._id}" class="btn-primary" style="width:100%;">Ver Detalles</a>
+        </div>
+    `;
+
   return card;
 }
 
