@@ -1,0 +1,193 @@
+/* =======================================
+   RESET Y ESTILOS GLOBALES
+   ======================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #121212;
+  color: #ffffff;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+/* =======================================
+   CONTENEDOR PRINCIPAL DEL PANEL
+   ======================================= */
+.admin-container {
+  background-color: #1e1e1e;
+  width: 100%;
+  max-width: 1100px;
+  padding: 40px;
+  border-radius: 10px;
+  border: 1px solid #333;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+}
+
+.admin-title {
+  font-size: 26px;
+  margin-bottom: 30px;
+  color: #e50914; /* Rojo OnlyCars */
+  border-bottom: 2px solid #333;
+  padding-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* =======================================
+   DISEÑO GRID PARA EL FORMULARIO
+   ======================================= */
+.admin-layout {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.form-section {
+  flex: 3;
+  min-width: 300px;
+}
+
+.actions-section {
+  flex: 1;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding-top: 25px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Crea exactamente dos columnas del mismo tamaño */
+  gap: 20px; /* Espaciado uniforme entre los campos, sin huecos irregulares */
+  width: 100%;
+}
+
+/* Clase mágica para que un campo ocupe todo el ancho de la cuadrícula */
+.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Aseguramos que todos los elementos de entrada llenen el 100% de su celda */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box; /* Evita que el padding empuje el elemento hacia afuera */
+  /* Mantén aquí tus estilos de colores oscuros, bordes y padding que ya tienes */
+}
+
+/* =======================================
+   INPUTS, SELECTS Y TEXTAREAS
+   ======================================= */
+label {
+  font-size: 14px;
+  color: #b3b3b3;
+  font-weight: 500;
+}
+
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 14px;
+  background-color: #2b2b2b;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+input[type="file"] {
+  color: #b3b3b3;
+  font-size: 14px;
+  padding: 10px 0;
+}
+
+/* Efecto focus en rojo */
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #e50914;
+  box-shadow: 0 0 5px rgba(229, 9, 20, 0.3);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* =======================================
+   BOTONES DE ACCIÓN DEL PANEL
+   ======================================= */
+.btn-admin {
+  padding: 14px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  width: 100%;
+  letter-spacing: 0.5px;
+}
+
+/* Botón Agregar y Modificar (Rojo) */
+.btn-primary {
+  background-color: #e50914;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #b20710;
+  transform: translateY(-2px);
+}
+
+/* Botón Eliminar (Gris oscuro, pasa a rojo al hover) */
+.btn-danger {
+  background-color: #333;
+  color: white;
+  border: 1px solid #555;
+}
+
+.btn-danger:hover {
+  background-color: #1a1a1a;
+  border-color: #e50914;
+  color: #e50914;
+}
+
+/* Botón Limpiar */
+.btn-secondary {
+  background-color: transparent;
+  color: #b3b3b3;
+  border: 1px solid #555;
+}
+
+.btn-secondary:hover {
+  background-color: #333;
+  color: white;
+}
+/* Contenedor de los botones en la parte inferior */
+.botones-container {
+  display: flex;
+  flex-direction: column; /* Apila los botones uno debajo del otro */
+  gap: 15px;
+  margin-top: 30px;
+  width: 100%;
+}

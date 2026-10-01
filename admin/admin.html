@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Vehículos</title>
+    <!-- Vinculamos el nuevo archivo CSS exclusivo para el admin -->
+    <link rel="stylesheet" href="./admin.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <h1 class="admin-title">Panel de Administración - CRUD Vehículos</h1>
+        <form id="vehiculo-form">
+            <div class="admin-layout">
+                <!-- SECCIÓN DEL FORMULARIO -->
+                <div class="form-section">
+                    <form id="form-vehiculo">
+
+                        <div class="form-group full-width"
+                            style="background: #2a2d3e; padding: 15px; border-left: 4px solid #f03a3a; margin-bottom: 20px;">
+                            <label style="color: #f03a3a; font-weight: bold;">ID del Vehículo (Dejar vacío
+                                si vas a crear uno nuevo)</label>
+                            <input type="text" id="vehiculo-id"
+                                placeholder="Ej: 651b8f... (Solo pégalo aquí si vas a Modificar o Eliminar)">
+                        </div>
+
+                        <!-- Inicia la cuadrícula de dos columnas -->
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label>Marca</label>
+                                <select id="marca">
+                                    <option value="Honda">Honda</option>
+                                    <option value="Kia">Kia</option>
+                                    <option value="Chevrolet">Chevrolet</option>
+                                    <option value="Toyota">Toyota</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Modelo</label>
+                                <input type="text" id="modelo" placeholder="Ej: Rio" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Año</label>
+                                <input type="number" id="año" placeholder="Ej: 2023" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Kilometraje</label>
+                                <input type="number" id="kilometraje" placeholder="Ej: 15000" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Motor</label>
+                                <input type="text" id="motor" placeholder="Ej: 1.6L">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Precio</label>
+                                <input type="number" id="precio" placeholder="Ej: 5000" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Transmisión</label>
+                                <select id="transmision">
+                                    <option value="Automática">Automática</option>
+                                    <option value="Sincrónica">Sincrónica</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Número de dueños</label>
+                                <input type="number" id="dueños" placeholder="Ej: 2" required>
+                            </div>
+
+                            <!-- Campos de ancho completo (full-width) para evitar espacios en blanco -->
+
+                            <div class="form-group full-width">
+                                <label>Estatus</label>
+                                <select id="estatus">
+                                    <option value="Disponible">Disponible</option>
+                                    <option value="Vendido">Vendido</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label>Descripción</label>
+                                <textarea id="descripcion" rows="4"
+                                    placeholder="Descripción detallada del vehículo"></textarea>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label>Imágenes del vehículo</label>
+                                <input type="file" id="input-imagenes" multiple accept="image/*">
+                            </div>
+
+                        </div>
+                        <!-- SECCIÓN DE BOTONES (ACCIONES) -->
+                        <div class="actions-section">
+                            <!-- Se eliminaron los "onclick" y se agregaron los "id" para el nuevo JS -->
+                            <button type="button" id="btn-agregar" class="btn-admin btn-primary">Agregar
+                                vehículo</button>
+                            <button type="button" id="btn-modificar" class="btn-admin btn-primary">Modificar V</button>
+                            <button type="button" id="btn-eliminar" class="btn-admin btn-danger">Eliminar V</button>
+                            <button type="button" id="btn-limpiar" class="btn-admin btn-secondary">Limpiar</button>
+                        </div>
+                </div>
+            </div>
+
+            <script src="./admin.js"></script>
+</body>
+
+</html>

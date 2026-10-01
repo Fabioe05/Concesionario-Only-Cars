@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="../../index.css">
     <link rel="stylesheet" href="./vehiculo.css">
 </head>
+
 <body>
     <nav class="navbar">
         <a href="../../index.html" class="logo">Only<span>Cars</span></a>
@@ -21,54 +23,46 @@
     </nav>
 
     <main class="container">
-        <header class="vehicle-header">
-            <h1 id="vehicle-title"></h1>
-        </header>
+        <!-- Título principal dinámico -->
+        <h1 class="vehicle-title" id="vehicle-title">Cargando vehículo...</h1>
 
         <section class="gallery-container">
-            <div class="main-photo">
-                <span>PASARELA DE FOTOS (FOTO PRINCIPAL)</span>
+            <!-- Sección de la Galería -->
+            <div class="main-image-wrapper">
+                <img id="main-image" src="" alt="Vehículo" />
             </div>
-            <div class="thumbnails-grid">
-                <div class="thumb">FOTO 1</div>
-                <div class="thumb">FOTO 2</div>
-                <div class="thumb">FOTO 3</div>
-                <div class="thumb">FOTO 4</div>
+            <div id="thumbnails-container"></div>
+
+            <!-- Modal para ampliar imagen (Lightbox) -->
+            <div id="lightbox-modal" class="lightbox-modal">
+                <span class="lightbox-close" id="lightbox-close">&times;</span>
+                <button class="lightbox-btn lightbox-prev" id="lightbox-prev">&#10094;</button>
+                <img class="lightbox-img" id="lightbox-img" src="" alt="Vista ampliada" />
+                <button class="lightbox-btn lightbox-next" id="lightbox-next">&#10095;</button>
             </div>
+
+            <!-- Contenedor para las miniaturas/fotos secundarias -->
+            <div class="thumbnails-grid" id="thumbnails-container"></div>
         </section>
+
 
         <section class="info-box">
             <h2>Información Técnica & Especificaciones</h2>
             <div class="specs-grid">
-                <div class="spec-item">
-                    <span class="spec-label">Motor</span>
-                    <span id="vehicle-motor" class="spec-value"></span>
-                </div>
-                <div class="spec-item">
-                    <span class="spec-label">Estatus</span>
-                    <span id="vehicle-status" class="spec-value"></span>
-                </div>
-                <div class="spec-item">
-                    <span class="spec-label">Transmisión</span>
-                    <span id="vehicle-transmission" class="spec-value"></span>
-                </div>
-                <div class="spec-item">
-                    <span class="spec-label">Numero de dueños</span>
-                    <span id="vehicle-owners" class="spec-value"></span>
-                </div>
-                <div class="spec-item">
-                    <span class="spec-label">Año</span>
-                    <span id="vehicle-year" class="spec-value"></span>
-                </div>
-                <div class="spec-item">
-                    <span class="spec-label">Precio</span>
-                    <span id="vehicle-price" class="spec-value highlight-price"></span>
-                </div>
+                <div class="spec-item"><span class="spec-label">Motor:</span> <span class="spec-value"
+                        id="vehicle-motor">-</span></div>
+                <div class="spec-item"><span class="spec-label">Estatus:</span> <span class="spec-value"
+                        id="vehicle-status">-</span></div>
+                <div class="spec-item"><span class="spec-label">Transmisión:</span> <span class="spec-value"
+                        id="vehicle-transmission">-</span></div>
+                <div class="spec-item"><span class="spec-label">Número de dueños:</span> <span class="spec-value"
+                        id="vehicle-owners">-</span></div>
+                <div class="spec-item"><span class="spec-label">Año:</span> <span class="spec-value"
+                        id="vehicle-year">-</span></div>
+                <div class="spec-item"><span class="spec-label">Precio:</span> <span class="spec-value"
+                        id="vehicle-price">-</span></div>
             </div>
-
-            <div class="vehicle-description" id="vehicle-description">
-
-            </div>
+            <p class="vehicle-description" id="vehicle-description"></p>
         </section>
 
         <div class="cta-container">

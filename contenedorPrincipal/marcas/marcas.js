@@ -9,24 +9,33 @@ function obtenerMarcaURL() {
   return params.get("brand"); // Retorna null si la URL es solo marcas.html
 }
 
-// Crea la estructura HTML para la tarjeta de un vehículo
+// Crea la estructura base para la tarjeta de un vehículo
 function crearTarjetaVehiculo(vehiculo) {
-  // 1. Obtenemos la marca directamente de la URL usando la función que ya tienes
-  const nombreMarca = obtenerMarcaURL();
+  // Captura el ID asegurando lectura de _id (MongoDB) o id
+  const vehiculoId = vehiculo._id || vehiculo.id;
 
   const card = document.createElement("div");
   card.className = "card";
 
-  // 2. Usamos 'nombreMarca' en la línea del título en lugar de 'vehiculo.marca'
+  // Evaluar si existen imágenes registradas
+  const imagenes = vehiculo.images || vehiculo.imagenes || [];
+  const imagenHTML =
+    imagenes.length > 0
+      ? `<img src="${imagenes[0]}" alt="${vehiculo.modelo}" style="width: 100%; height: 100%; object-fit: cover;" />`
+      : `Imagen de ${vehiculo.modelo}`;
+
   card.innerHTML = `
-        <div class="card-img">Imagen de ${vehiculo.modelo}</div>
-        <div class="card-body">
-            <h3 class="card-title">${nombreMarca} ${vehiculo.modelo}</h3>
-            <div class="card-price">$${vehiculo.precio}</div>
-            <p class="card-text">${vehiculo.transmision} - ${vehiculo.motor}</p>
-            <a href="vehiculo.html?id=${vehiculo._id}" class="btn-primary" style="width:100%;">Ver Detalles</a>
-        </div>
-    `;
+    <div class="card-image">
+      ${imagenHTML}
+    </div>
+    <div class="card-body">
+      <h3>${vehiculo.marca ? vehiculo.marca : ""} ${vehiculo.modelo}</h3>
+      <div class="card-price">$${vehiculo.precio}</div>
+      <p class="card-details">${vehiculo.transmision} - ${vehiculo.motor}</p>
+      
+      <a href="./vehiculo.html?id=${vehiculoId}" class="btn btn-primary width-100">VER DETALLES</a>
+    </div>
+  `;
 
   return card;
 }

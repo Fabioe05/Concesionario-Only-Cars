@@ -6,11 +6,17 @@ const Vehiculo = require("./models/Vehiculo");
 const Marca = require("./models/Marca");
 const cors = require("cors");
 const path = require("path");
+const vehiculosRouter = require("./controllers/vehiculos");
 
 //middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "/")));
+app.use("/images", express.static(path.join(__dirname, "images")));
+app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
+
+//Backend API Routes
+app.use("/api/vehiculos", vehiculosRouter);
 
 // Conexión a MongoDB
 (async () => {
@@ -50,9 +56,9 @@ app.get("/api/vehiculos/marca/:marca", async (req, res) => {
   try {
     const marcaParam = req.params.marca;
 
-    // 1. Primero buscamos el documento de la marca por su texto (ej. "Kia")
+    // 1. Primero buscamos el documento de la marca por su texto
     const marcaEncontrada = await Marca.findOne({
-      name: { $regex: new RegExp(`${marcaParam}$`, "i") }, // Cambia "nombre" si en tu DB de Marcas se llama diferente
+      name: { $regex: new RegExp(`^${marcaParam}$`, "i") },
     });
 
     if (!marcaEncontrada) {
@@ -92,3 +98,7 @@ app.post("/api/vehiculos", async (req, res) => {
 });
 
 module.exports = app;
+
+// 1. Importas el archivo que acabamos de crear
+
+// 2. Le dices a Express que use este enrutador para todo lo que empiece con /api/vehiculos

@@ -57,6 +57,10 @@ const vehiculoSchema = new mongoose.Schema(
       type: String,
       required: [true, "La descripción es requerida"],
     },
+    images: {
+      type: [String],
+      default: [],
+    },
   },
   {
     timestamps: true, // Agrega createdAt y updatedAt automáticamente
