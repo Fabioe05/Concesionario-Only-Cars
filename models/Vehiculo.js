@@ -17,7 +17,7 @@ const vehiculoSchema = new mongoose.Schema(
       required: [true, "El modelo es requerido"],
       trim: true,
     },
-    año: {
+    anio: {
       type: Number,
       required: [true, "El año es requerido"],
     },
