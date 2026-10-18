@@ -851,7 +851,7 @@ input[type="file"] {
   }
   .vehiculos-table .vehiculo-img-thumb,
   .vehiculos-table .vehiculo-no-img {
-    height: 110px;
+    height: 150px;
   }
   .vehiculos-table td.td-acciones .btn-action {
     font-size: 10px;
