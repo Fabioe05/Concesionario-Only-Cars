@@ -5,27 +5,26 @@ const vehiculosRouter = require("express").Router();
 const upload = require("../middlewares/upload");
 const { userExtractor, requireAdmin } = require("../middlewares/auth");
 const { borrarImagenes } = require("../utils/imagenes");
+const { subirImagenes } = require("../utils/almacenamiento");
 /**
  * 1. Registrar un nuevo vehículo
  * POST /api/vehiculos
  */
 vehiculosRouter.post("/", userExtractor, requireAdmin, upload.array("imagenes", 10), async (req, res) => {
+  let urlsImagenes = [];
   try {
     const nuevoVehiculo = new Vehiculo(req.body);
     if (req.files && req.files.length > 0) {
-      const rutasImagenes = req.files.map(
-        (file) => `/uploads/${file.filename}`,
-      );
-      nuevoVehiculo.images = rutasImagenes;
+      // Subimos las imágenes a la base de datos y guardamos sus URLs.
+      urlsImagenes = await subirImagenes(req.files);
+      nuevoVehiculo.images = urlsImagenes;
     }
     const vehiculoGuardado = await nuevoVehiculo.save();
 
     return res.status(201).json(vehiculoGuardado);
   } catch (error) {
-    // Si el guardado falla, multer ya escribió los archivos: los limpiamos.
-    await borrarImagenes(
-      (req.files || []).map((file) => `/uploads/${file.filename}`),
-    );
+    // Si el guardado falla, limpiamos las imágenes que ya se guardaron.
+    await borrarImagenes(urlsImagenes);
 
     if (error.name === "ValidationError") {
       const errores = Object.values(error.errors).map((err) => err.message);
@@ -126,6 +125,7 @@ vehiculosRouter.get("/marca/:marca", async (req, res) => {
  * PUT /api/vehiculos/:id
  */
 vehiculosRouter.put("/:id", userExtractor, requireAdmin, upload.array("imagenes", 10), async (req, res) => {
+  let imagenesNuevas = [];
   try {
     const { id } = req.params;
 
@@ -150,19 +150,18 @@ vehiculosRouter.put("/:id", userExtractor, requireAdmin, upload.array("imagenes"
 
       // Si el campo llegó pero no es una lista válida, no tocamos nada:
       // tratarlo como lista vacía borraría todas las fotos del vehículo.
+      // (Aquí aún no subimos nada, así que no hay archivos que limpiar.)
       if (!Array.isArray(imagenesConservadas)) {
-        await borrarImagenes(
-          (req.files || []).map((file) => `/uploads/${file.filename}`),
-        );
         return res.status(400).json({
           error: "El listado de imágenes a conservar no es válido.",
         });
       }
     }
 
-    const imagenesNuevas = (req.files || []).map(
-      (file) => `/uploads/${file.filename}`,
-    );
+    // Subimos las imágenes nuevas a la base de datos y guardamos sus URLs.
+    if (req.files && req.files.length > 0) {
+      imagenesNuevas = await subirImagenes(req.files);
+    }
 
     // Solo tocamos las imágenes si el formulario envió ese campo.
     if (req.body.keepExistingImages || imagenesNuevas.length > 0) {
@@ -176,12 +175,13 @@ vehiculosRouter.put("/:id", userExtractor, requireAdmin, upload.array("imagenes"
     });
 
     if (!vehiculoActualizado) {
-      // No existe: limpiamos las imágenes nuevas que multer ya había subido.
+      // No existe: limpiamos las imágenes nuevas que ya subimos.
       await borrarImagenes(imagenesNuevas);
       return res.status(404).json({ mensaje: "Vehículo no encontrado" });
     }
 
-    // Borramos del disco las imágenes que ya no forman parte del vehículo.
+    // Borramos las imágenes que ya no forman parte del vehículo
+    // (tanto locales como guardadas en la base de datos).
     const imagenesBorradas = (vehiculoAnterior?.images || []).filter(
       (url) => !vehiculoActualizado.images.includes(url),
     );
@@ -189,10 +189,8 @@ vehiculosRouter.put("/:id", userExtractor, requireAdmin, upload.array("imagenes"
 
     return res.json(vehiculoActualizado);
   } catch (error) {
-    // Si la actualización falla, los archivos recién subidos quedan huérfanos.
-    await borrarImagenes(
-      (req.files || []).map((file) => `/uploads/${file.filename}`),
-    );
+    // Si la actualización falla, las imágenes recién subidas quedarían huérfanas.
+    await borrarImagenes(imagenesNuevas);
 
     if (error.name === "ValidationError") {
       const errores = Object.values(error.errors).map((err) => err.message);

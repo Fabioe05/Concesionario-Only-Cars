@@ -1,22 +1,9 @@
 const multer = require("multer");
-const path = require("path");
 
-// Configuración de almacenamiento local para Multer
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    // La carpeta donde se guardarán las fotos (ruta absoluta para no depender
-    // del directorio desde el que se arranque el servidor).
-    cb(null, path.join(__dirname, "..", "public", "uploads"));
-  },
-  filename: function (req, file, cb) {
-    // Renombra el archivo para evitar nombres duplicados
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  },
-});
-
+// Las imágenes ya no se escriben en disco: Multer las deja en memoria
+// (req.files[i].buffer) y el controlador las sube a Cloudinary.
 const upload = multer({
-  storage: storage,
+  storage: multer.memoryStorage(),
   // Máximo 5 MB por imagen.
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
@@ -29,5 +16,5 @@ const upload = multer({
   },
 });
 
-// Exportamos el middleware para poder usarlo en tus rutas
+// Exportamos el middleware para poder usarlo en las rutas
 module.exports = upload;

@@ -13,6 +13,7 @@ const cookieParser = require("cookie-parser");
 const vehiculosRouter = require("./controllers/vehiculos");
 const marcasRouter = require("./controllers/marcas");
 const authRouter = require("./controllers/auth");
+const imagenesRouter = require("./controllers/imagenes");
 
 const app = express();
 
@@ -45,6 +46,7 @@ ARCHIVOS_PUBLICOS.forEach((archivo) => {
 app.use("/api/vehiculos", vehiculosRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/marcas", marcasRouter);
+app.use("/api/imagenes", imagenesRouter);
 
 // --- Manejo de errores de subida (multer responde HTML 500 por defecto) ---
 app.use((error, req, res, next) => {
