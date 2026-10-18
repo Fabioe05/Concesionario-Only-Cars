@@ -190,18 +190,19 @@ input[type="file"] {
 
 /* BASE PARA BOTONES */
 .btn-nuevo-vehiculo,
+.btn-volver-inicio,
 .btn-limpiar-filtros,
 .btn-action,
 .btn-volver,
 .btn-admin,
 .btn-primary,
-.btn-danger,
 .btn-secondary,
 .btn-modal-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
+  padding: 5px;
   font-weight: 700;
   cursor: pointer;
   text-transform: uppercase;
@@ -213,7 +214,6 @@ input[type="file"] {
 /* BOTONES ROJOS */
 .btn-nuevo-vehiculo,
 .btn-primary,
-.btn-danger,
 .btn-action.btn-delete,
 .btn-modal-delete {
   background-color: var(--rojo);
@@ -228,7 +228,6 @@ input[type="file"] {
 }
 .btn-nuevo-vehiculo:hover,
 .btn-primary:hover,
-.btn-danger:hover,
 .btn-action.btn-delete:hover,
 .btn-modal-delete:hover {
   background-color: var(--rojo-hover);
@@ -238,6 +237,7 @@ input[type="file"] {
 
 /* BOTONES OSCUROS / SECUNDARIOS */
 .btn-limpiar-filtros,
+.btn-volver-inicio,
 .btn-volver,
 .btn-action.btn-edit,
 .btn-secondary,
@@ -276,8 +276,8 @@ input[type="file"] {
   font-size: 14px;
 }
 .btn-action {
-  padding: 8px 16px;
-  font-size: 12px;
+  padding: 7px 12px;
+  font-size: 11.5px;
 }
 .btn-action.btn-view {
   background-color: var(--bg-secundario);
@@ -354,12 +354,12 @@ input[type="file"] {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 14px;
+  font-size: 13.5px;
 }
 .vehiculos-table th {
   background-color: #212128;
   color: var(--gris-claro);
-  padding: 14px 16px;
+  padding: 12px 10px;
   font-weight: 700;
   text-transform: uppercase;
   font-size: 12px;
@@ -368,7 +368,7 @@ input[type="file"] {
   white-space: nowrap;
 }
 .vehiculos-table td {
-  padding: 14px 16px;
+  padding: 12px 10px;
   border-bottom: 1px solid var(--borde-1);
   color: var(--gris);
   vertical-align: middle;
@@ -600,7 +600,112 @@ input[type="file"] {
     transform: scale(1);
   }
 }
+/* ==========================================
+   RESPONSIVE - PANEL DE ADMIN
+   ========================================== */
+
+/* PANTALLAS MEDIANAS Y TABLETS -> TABLA EN TARJETAS (SIN SCROLL) */
+@media (max-width: 1200px) {
+  .table-responsive {
+    overflow-x: visible;
+    border: none;
+    border-radius: 0;
+  }
+  .vehiculos-table {
+    font-size: 13px;
+  }
+  .vehiculos-table thead {
+    display: none;
+  }
+  .vehiculos-table,
+  .vehiculos-table tbody,
+  .vehiculos-table tr,
+  .vehiculos-table td {
+    display: block;
+    width: 100%;
+  }
+  .vehiculos-table tr {
+    background-color: var(--bg-secundario);
+    border: 1px solid var(--borde-2);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+  }
+  .vehiculos-table tr:hover {
+    background-color: var(--bg-secundario);
+  }
+  .vehiculos-table td {
+    border-bottom: 1px solid var(--borde-1);
+    padding: 6px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: right;
+  }
+  .vehiculos-table td:last-child {
+    border-bottom: none;
+  }
+  .vehiculos-table td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--gris-oscuro);
+    text-align: left;
+  }
+  .vehiculos-table td[colspan] {
+    text-align: center;
+    border-bottom: none;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .vehiculos-table td[colspan]::before {
+    content: none;
+  }
+  .vehiculos-table td.td-img,
+  .vehiculos-table td.td-acciones {
+    display: block;
+    text-align: center;
+    border-bottom: none;
+  }
+  .vehiculos-table td.td-img::before,
+  .vehiculos-table td.td-acciones::before {
+    content: none;
+  }
+  .vehiculos-table .vehiculo-img-thumb,
+  .vehiculos-table .vehiculo-no-img {
+    width: 100%;
+    max-width: 420px;
+    height: 260px;
+    margin: 0 auto 6px;
+  }
+  .vehiculos-table td.td-img .vehiculo-no-img {
+    font-size: 13px;
+  }
+  .vehiculos-table td.td-acciones .actions-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    justify-content: center;
+  }
+  .vehiculos-table td.td-acciones .btn-action {
+    flex: 1;
+    min-width: 70px;
+    max-width: 220px;
+    font-size: 11px;
+    padding: 7px 10px;
+  }
+}
+
+/* TABLETS VERTICALES Y MÓVILES */
 @media (max-width: 768px) {
+  body {
+    padding: 20px 12px;
+  }
   .admin-container {
     padding: 20px;
   }
@@ -609,5 +714,165 @@ input[type="file"] {
   }
   .admin-layout {
     flex-direction: column;
+  }
+  .form-section,
+  .actions-section {
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* ENCABEZADO PRINCIPAL */
+  .admin-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .admin-title {
+    font-size: 21px;
+  }
+  .admin-header .btn-volver-inicio,
+  .admin-header .btn-nuevo-vehiculo {
+    width: 100%;
+  }
+
+  /* ENCABEZADO DEL FORMULARIO */
+  .form-header-bar {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .form-titulo {
+    font-size: 19px;
+  }
+
+  /* BARRA DE FILTROS */
+  .filtros-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 16px;
+  }
+  .filtro-campo,
+  .filtro-buscar {
+    flex: none;
+    min-width: 0;
+    width: 100%;
+  }
+  .filtro-acciones,
+  .btn-limpiar-filtros {
+    width: 100%;
+  }
+
+  /* TIPOGRAFÍA MÁS COMPACTA */
+  .admin-subtitle,
+  .modal-subtitle {
+    font-size: 12.5px;
+  }
+  input[type="text"],
+  input[type="number"],
+  select,
+  textarea,
+  .filtro-select,
+  .filtro-input {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+  label,
+  .filtro-campo label,
+  .detalle-label,
+  .detalle-seccion-titulo {
+    font-size: 12px;
+  }
+  .status-badge {
+    font-size: 11px;
+  }
+
+  /* MODAL DE DETALLES */
+  .modal-overlay {
+    padding: 12px;
+  }
+  .modal-header {
+    padding: 16px;
+  }
+  .modal-body {
+    padding: 16px;
+    gap: 16px;
+  }
+  .modal-footer {
+    padding: 14px 16px;
+    flex-wrap: wrap;
+  }
+  .detalle-imagen-principal-wrapper {
+    height: 200px;
+  }
+  .detalle-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* MÓVILES PEQUEÑOS */
+@media (max-width: 480px) {
+  .admin-container {
+    padding: 14px;
+  }
+  .admin-title {
+    font-size: 17px;
+    letter-spacing: 1px;
+  }
+  .form-titulo {
+    font-size: 16px;
+  }
+  .admin-subtitle,
+  .modal-subtitle {
+    font-size: 11.5px;
+  }
+  input[type="text"],
+  input[type="number"],
+  select,
+  textarea,
+  .filtro-select,
+  .filtro-input {
+    font-size: 12.5px;
+    padding: 9px 11px;
+  }
+
+  /* TARJETAS DE LA TABLA AÚN MÁS PEQUEÑAS */
+  .vehiculos-table {
+    font-size: 12.5px;
+  }
+  .vehiculos-table tr {
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+  .vehiculos-table td {
+    padding: 5px 0;
+    gap: 10px;
+  }
+  .vehiculos-table td::before {
+    font-size: 9.5px;
+  }
+  .vehiculos-table .vehiculo-img-thumb,
+  .vehiculos-table .vehiculo-no-img {
+    height: 110px;
+  }
+  .vehiculos-table td.td-acciones .btn-action {
+    font-size: 10px;
+    padding: 6px 8px;
+    min-width: 60px;
+  }
+
+  .modal-header {
+    padding: 14px;
+  }
+  .modal-body {
+    padding: 14px;
+  }
+  .modal-footer {
+    padding: 12px;
+    flex-direction: column;
+  }
+  .modal-footer .btn-modal-action {
+    width: 100%;
+  }
+  .detalle-grid {
+    grid-template-columns: 1fr;
   }
 }

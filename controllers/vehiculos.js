@@ -2,34 +2,31 @@ const mongoose = require("mongoose");
 const Vehiculo = require("../models/Vehiculo");
 const Marca = require("../models/Marca");
 const vehiculosRouter = require("express").Router();
-const upload = require("../middlewares/upload"); // <--- Importamos tu nuevo middleware
+const upload = require("../middlewares/upload");
+const { userExtractor, requireAdmin } = require("../middlewares/auth");
+const { borrarImagenes } = require("../utils/imagenes");
 /**
  * 1. Registrar un nuevo vehículo
  * POST /api/vehiculos
  */
-vehiculosRouter.post("/", upload.array("imagenes", 5), async (req, res) => {
- try {
-        // 1. Ver qué está llegando en consola (antes de hacer return)
-        console.log("Archivos recibidos de Multer:", req.files);
-        // 2. Crear el objeto del vehículo con los datos de texto (req.body)
-        const nuevoVehiculo = new Vehiculo(req.body);
-        // 3. Evaluar si llegaron imágenes y extraer sus rutas
-        if (req.files && req.files.length > 0) {
-            // Mapeamos el arreglo req.files para obtener la ruta que guardaremos en BD.
-            // Si guardaste en public/uploads/, la ruta para el frontend será /uploads/nombre-archivo.jpg
-            const rutasImagenes = req.files.map(file => `/uploads/${file.filename}`);
-            // Asignamos ese arreglo de rutas al modelo. 
-            // IMPORTANTE: Asegúrate de que el nombre aquí ('images' o 'imagenes') 
-            // sea exactamente el mismo que definiste en tu Vehiculo.js (el modelo de Mongoose).
-            nuevoVehiculo.images = rutasImagenes; 
-        }
+vehiculosRouter.post("/", userExtractor, requireAdmin, upload.array("imagenes", 10), async (req, res) => {
+  try {
+    const nuevoVehiculo = new Vehiculo(req.body);
+    if (req.files && req.files.length > 0) {
+      const rutasImagenes = req.files.map(
+        (file) => `/uploads/${file.filename}`,
+      );
+      nuevoVehiculo.images = rutasImagenes;
+    }
+    const vehiculoGuardado = await nuevoVehiculo.save();
 
-        // 4. Ahora sí, guardar en la base de datos (texto + rutas de fotos)
-        const vehiculoGuardado = await nuevoVehiculo.save();
-
-        // 5. Retornar la respuesta exitosa
-        return res.status(201).json(vehiculoGuardado);
+    return res.status(201).json(vehiculoGuardado);
   } catch (error) {
+    // Si el guardado falla, multer ya escribió los archivos: los limpiamos.
+    await borrarImagenes(
+      (req.files || []).map((file) => `/uploads/${file.filename}`),
+    );
+
     if (error.name === "ValidationError") {
       const errores = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({
@@ -128,7 +125,7 @@ vehiculosRouter.get("/marca/:marca", async (req, res) => {
  * 5. Actualizar los datos de un vehículo por su ID
  * PUT /api/vehiculos/:id
  */
-vehiculosRouter.put("/:id", async (req, res) => {
+vehiculosRouter.put("/:id", userExtractor, requireAdmin, upload.array("imagenes", 10), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -136,19 +133,67 @@ vehiculosRouter.put("/:id", async (req, res) => {
       return res.status(400).json({ mensaje: "ID de vehículo no válido" });
     }
 
-    // findByIdAndUpdate busca por ID y reemplaza con lo que venga en req.body.
-    // { new: true } devuelve el documento ya actualizado, runValidators aplica las reglas de tu modelo.
-    const vehiculoActualizado = await Vehiculo.findByIdAndUpdate(id, req.body, {
+    // Datos actuales, para saber qué imágenes se quitaron.
+    const vehiculoAnterior = await Vehiculo.findById(id);
+
+    const datos = { ...req.body };
+
+    // Imágenes: conservamos las que el admin dejó y añadimos las nuevas subidas.
+    let imagenesConservadas = [];
+
+    if (req.body.keepExistingImages) {
+      try {
+        imagenesConservadas = JSON.parse(req.body.keepExistingImages);
+      } catch (error) {
+        imagenesConservadas = null;
+      }
+
+      // Si el campo llegó pero no es una lista válida, no tocamos nada:
+      // tratarlo como lista vacía borraría todas las fotos del vehículo.
+      if (!Array.isArray(imagenesConservadas)) {
+        await borrarImagenes(
+          (req.files || []).map((file) => `/uploads/${file.filename}`),
+        );
+        return res.status(400).json({
+          error: "El listado de imágenes a conservar no es válido.",
+        });
+      }
+    }
+
+    const imagenesNuevas = (req.files || []).map(
+      (file) => `/uploads/${file.filename}`,
+    );
+
+    // Solo tocamos las imágenes si el formulario envió ese campo.
+    if (req.body.keepExistingImages || imagenesNuevas.length > 0) {
+      datos.images = [...imagenesConservadas, ...imagenesNuevas];
+    }
+    delete datos.keepExistingImages;
+
+    const vehiculoActualizado = await Vehiculo.findByIdAndUpdate(id, datos, {
       new: true,
       runValidators: true,
     });
 
     if (!vehiculoActualizado) {
+      // No existe: limpiamos las imágenes nuevas que multer ya había subido.
+      await borrarImagenes(imagenesNuevas);
       return res.status(404).json({ mensaje: "Vehículo no encontrado" });
     }
 
+    // Borramos del disco las imágenes que ya no forman parte del vehículo.
+    const imagenesBorradas = (vehiculoAnterior?.images || []).filter(
+      (url) => !vehiculoActualizado.images.includes(url),
+    );
+    await borrarImagenes(imagenesBorradas);
+
     return res.json(vehiculoActualizado);
   } catch (error) {
+    // Si la actualización falla, los archivos recién subidos quedan huérfanos.
+    await borrarImagenes(
+      (req.files || []).map((file) => `/uploads/${file.filename}`),
+    );
+
     if (error.name === "ValidationError") {
       const errores = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({
@@ -167,7 +212,7 @@ vehiculosRouter.put("/:id", async (req, res) => {
  * 6. Eliminar un vehículo por su ID
  * DELETE /api/vehiculos/:id
  */
-vehiculosRouter.delete("/:id", async (req, res) => {
+vehiculosRouter.delete("/:id", userExtractor, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -181,6 +226,9 @@ vehiculosRouter.delete("/:id", async (req, res) => {
     if (!vehiculoEliminado) {
       return res.status(404).json({ mensaje: "Vehículo no encontrado" });
     }
+
+    // Borramos del disco las imágenes del vehículo eliminado.
+    await borrarImagenes(vehiculoEliminado.images);
 
     return res.json({
       mensaje: "Vehículo eliminado exitosamente",

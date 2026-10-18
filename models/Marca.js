@@ -28,7 +28,6 @@ marcaSchema.set("toJSON", {
     delete ret.__v;
     return ret;
   },
-  collection: "Marcas",
 });
 
 module.exports = mongoose.model("Marca", marcaSchema);

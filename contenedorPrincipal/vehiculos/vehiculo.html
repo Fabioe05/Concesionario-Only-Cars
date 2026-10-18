@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del Vehículo | Only Cars</title>
+    <link rel="stylesheet" href="../../index.css">
+    <link rel="stylesheet" href="./vehiculo.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="../../index.html" class="logo">Only<span>Cars</span></a>
+        <ul class="nav-links">
+            <li><a href="../../index.html#marcas">Marcas</a></li>
+            <li><a href="../../index.html#quienes-somos">Quiénes Somos</a></li>
+            <li><a href="../../index.html#contacto">Contacto</a></li>
+        </ul>
+        <div class="nav-auth">
+            <a href="../registro/registro.html" id="btn-registro" class="btn-outline">Registro</a>
+            <a href="../login/login.html" id="btn-login" class="btn-outline">Login</a>
+            <div class="perfil" id="perfil">
+                <button type="button" id="btn-perfil" class="perfil-btn" aria-haspopup="true" aria-expanded="false"
+                    aria-label="Perfil de usuario">
+                    <span id="perfil-iniciales">?</span>
+                </button>
+
+                <div class="perfil-panel" id="perfil-panel" hidden>
+                    <div class="perfil-cabecera">
+                        <span class="perfil-avatar" id="perfil-avatar">?</span>
+                        <div class="perfil-titulo">
+                            <strong id="perfil-nombre">—</strong>
+                            <span class="perfil-rol" id="perfil-rol">—</span>
+                        </div>
+                    </div>
+
+                    <div class="perfil-datos">
+                        <div class="perfil-dato">
+                            <span class="perfil-etiqueta">Correo</span>
+                            <span id="perfil-correo">—</span>
+                        </div>
+                        <div class="perfil-dato">
+                            <span class="perfil-etiqueta">Registro</span>
+                            <span id="perfil-registro">—</span>
+                        </div>
+                    </div>
+
+                    <a href="../../admin/admin.html" id="btn-admin" class="perfil-admin">Panel de Administración</a>
+
+                    <button type="button" id="btn-cerrar-sesion" class="perfil-salir">Cerrar Sesión</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Título principal dinámico -->
+        <h1 class="vehicle-title" id="vehicle-title">Cargando vehículo...</h1>
+
+        <section class="gallery-container">
+            <!-- Sección de la Galería -->
+            <div class="main-image-wrapper">
+                <img id="main-image" src="" alt="Vehículo" />
+            </div>
+            <div id="thumbnails-container"></div>
+
+            <!-- Modal para ampliar imagen (Lightbox) -->
+            <div id="lightbox-modal" class="lightbox-modal">
+                <span class="lightbox-close" id="lightbox-close">&times;</span>
+                <button class="lightbox-btn lightbox-prev" id="lightbox-prev">&#10094;</button>
+                <img class="lightbox-img" id="lightbox-img" src="" alt="Vista ampliada" />
+                <button class="lightbox-btn lightbox-next" id="lightbox-next">&#10095;</button>
+            </div>
+
+        </section>
+
+
+        <section class="info-box">
+            <h2>Información Técnica & Especificaciones</h2>
+            <div class="specs-grid">
+                <div class="spec-item"><span class="spec-label">Motor:</span> <span class="spec-value"
+                        id="vehicle-motor">-</span></div>
+                <div class="spec-item"><span class="spec-label">Estatus:</span> <span class="spec-value"
+                        id="vehicle-status">-</span></div>
+                <div class="spec-item"><span class="spec-label">Transmisión:</span> <span class="spec-value"
+                        id="vehicle-transmission">-</span></div>
+                <div class="spec-item"><span class="spec-label">Número de dueños:</span> <span class="spec-value"
+                        id="vehicle-owners">-</span></div>
+                <div class="spec-item"><span class="spec-label">Año:</span> <span class="spec-value"
+                        id="vehicle-year">-</span></div>
+                <div class="spec-item"><span class="spec-label">Precio:</span> <span class="spec-value"
+                        id="vehicle-price">-</span></div>
+            </div>
+            <p class="vehicle-description" id="vehicle-description"></p>
+        </section>
+
+        <div class="cta-container">
+            <a href="../../index.html#contacto" class="btn-primary btn-large">Contactar</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-info">
+                <img src="/img/logo.png" alt="Only Cars" class="footer-logo">
+                <p>Av. Principal de las Mercedes, Caracas, Venezuela</p>
+                <p>Desarrollado por <a href="https://github.com/Fabioe05/Concesionario-Only-Cars" target="_blank"
+                        rel="noopener">Fabio Espinoza</a></p>
+            </div>
+
+            <div class="footer-social">
+                <a href="https://github.com/Fabioe05/Concesionario-Only-Cars" target="_blank" rel="noopener"
+                    class="social-icon" aria-label="GitHub" title="GitHub">
+                    <img src="../../img/icons8-github-50.png" alt="" width="50" height="50" loading="lazy" decoding="async">
+                </a>
+                <a href="https://www.instagram.com/onlycars2018/?hl=es" target="_blank" rel="noopener"
+                    class="social-icon" aria-label="Instagram" title="Instagram">
+                    <img src="../../img/icons8-instagram-50.png" alt="" width="50" height="50" loading="lazy" decoding="async">
+                </a>
+                <a href="https://wa.me/584241667681" target="_blank" rel="noopener" class="social-icon"
+                    aria-label="WhatsApp" title="WhatsApp">
+                    <img src="../../img/icons8-whatsapp-50.png" alt="" width="50" height="50" loading="lazy" decoding="async">
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../../sesion.js"></script>
+    <script src="./vehiculo.js"></script>
+
+</body>
+
+</html>

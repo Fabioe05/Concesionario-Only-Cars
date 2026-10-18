@@ -1,85 +1,96 @@
-const PASSWORD_REGEX = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,26}$/;
-const NAME_REGEX =
+const REGEX_CLAVE = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,26}$/;
+const REGEX_NOMBRE =
   /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]{2,18}(\s[a-zA-ZáéíóúÁÉÍÓÚñÑ]{2,18})+$/;
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const NUMBER_REGEX = /^\d{7,15}$/;
+const REGEX_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Selectores
-const nameInput = document.querySelector("#name");
-const lastnameInput = document.querySelector("#lastname");
-const emailInput = document.querySelector("#email");
-const passwordInput = document.querySelector("#password");
-const confirmPasswordInput = document.querySelector("#confirm-password");
-const boton = document.querySelector("#boton");
-const form = document.querySelector("#form");
+const inputNombre = document.querySelector("#name");
+const inputCorreo = document.querySelector("#email");
+const inputClave = document.querySelector("#password");
+const inputConfirmarClave = document.querySelector("#confirm-password");
+const btnEnviar = document.querySelector("#boton");
+const formulario = document.querySelector("#form");
 
-//Validation
-let nameValidation = false;
-let lastnameValidation = false;
-let emailValidation = false;
-let passwordValidation = false;
-let confirmPasswordValidation = false;
+// Validación
+let nombreValido = false;
+let correoValido = false;
+let claveValida = false;
+let confirmacionValida = false;
 
-// Function
+// Funciones
 
-// ajustar los estilos
-const validador = (event, validation, element) => {
-  const information = event.target.parentElement.children[2];
-  boton.disabled =
-    nameValidation &&
-    lastnameValidation &&
-    emailValidation &&
-    passwordValidation &&
-    confirmPasswordValidation
+// Ajusta los estilos del campo según si el valor es válido o no
+const validarCampo = (event, esValido, element) => {
+  const aviso = event.target.parentElement.children[2];
+  btnEnviar.disabled =
+    nombreValido && correoValido && claveValida && confirmacionValida
       ? false
       : true;
-  if (validation) {
+
+  if (esValido) {
     element.classList.add("true");
     element.classList.remove("false");
-    information.classList.remove("show-information");
+    aviso.classList.remove("show-information");
   } else {
     element.classList.add("false");
     element.classList.remove("true");
-    information.classList.add("show-information");
+    aviso.classList.add("show-information");
   }
 };
 
-// recibir la informacion del input y validar
-nameInput.addEventListener("input", (event) => {
-  nameValidation = NAME_REGEX.test(event.target.value);
-  validador(event, nameValidation, nameInput);
+// Recibe la información del input y la valida
+inputNombre.addEventListener("input", (event) => {
+  nombreValido = REGEX_NOMBRE.test(event.target.value);
+  validarCampo(event, nombreValido, inputNombre);
 });
 
-lastnameInput.addEventListener("input", (event) => {
-  lastnameValidation = NAME_REGEX.test(event.target.value);
-  validador(event, lastnameValidation, lastnameInput);
+inputCorreo.addEventListener("input", (event) => {
+  correoValido = REGEX_CORREO.test(event.target.value);
+  validarCampo(event, correoValido, inputCorreo);
 });
 
-emailInput.addEventListener("input", (event) => {
-  emailValidation = EMAIL_REGEX.test(event.target.value);
-  validador(event, emailValidation, emailInput);
+inputClave.addEventListener("input", (event) => {
+  claveValida = REGEX_CLAVE.test(event.target.value);
+  validarCampo(event, claveValida, inputClave);
 });
 
-passwordInput.addEventListener("input", (event) => {
-  passwordValidation = PASSWORD_REGEX.test(event.target.value);
-  validador(event, passwordValidation, passwordInput);
+inputConfirmarClave.addEventListener("input", (event) => {
+  confirmacionValida = inputClave.value === event.target.value;
+  validarCampo(event, confirmacionValida, inputConfirmarClave);
 });
 
-confirmPasswordInput.addEventListener("input", (event) => {
-  confirmPasswordValidation = passwordInput.value === event.target.value;
-  validador(event, confirmPasswordValidation, confirmPasswordInput);
-  return;
-});
-
-form.addEventListener("submit", (event) => {
+formulario.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const user = {
-    name: nameInput.value,
-    lastname: lastnameInput.value,
-    email: emailInput.value,
-    password: passwordInput.value,
-  };
-  alert(
-    `Usuario creado exitosamente: \n Nombre: ${user.name} \n Apellido: ${user.lastname} \n Correo: ${user.email}`,
-  );
+
+  // 1. Verificamos que todos los REGEX hayan dado 'true'
+  if (nombreValido && correoValido && claveValida && confirmacionValida) {
+    const nombre = inputNombre.value;
+    const correo = inputCorreo.value;
+    const clave = inputClave.value;
+
+    try {
+      // 2. Hacemos la petición al backend
+      const respuesta = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: nombre, email: correo, password: clave }),
+      });
+
+      const datos = await respuesta.json();
+
+      if (respuesta.ok) {
+        alert("Usuario creado exitosamente. Ahora puedes iniciar sesión.");
+        window.location.href = "../login/login.html"; // Redirigir al login
+      } else {
+        alert(datos.error || "Error al registrar el usuario");
+      }
+    } catch (error) {
+      console.error("Error de red:", error);
+      alert("Error al conectar con el servidor.");
+    }
+  } else {
+    alert(
+      "Por favor, completa correctamente todos los campos en rojo antes de enviar.",
+    );
+  }
 });

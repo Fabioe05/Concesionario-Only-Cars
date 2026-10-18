@@ -9,22 +9,22 @@ const descripcionVehiculo = document.getElementById("vehicle-description");
 const precioVehiculo = document.getElementById("vehicle-price");
 
 // Selectores de la Galería
-const mainImg = document.getElementById("main-image");
-const thumbnailsContainer = document.getElementById("thumbnails-container");
+const imagenPrincipal = document.getElementById("main-image");
+const contenedorMiniaturas = document.getElementById("thumbnails-container");
 
 // Selectores del Lightbox
-const lightboxModal = document.getElementById("lightbox-modal");
-const lightboxImg = document.getElementById("lightbox-img");
-const lightboxClose = document.getElementById("lightbox-close");
-const lightboxPrev = document.getElementById("lightbox-prev");
-const lightboxNext = document.getElementById("lightbox-next");
+const modalLightbox = document.getElementById("lightbox-modal");
+const imagenLightbox = document.getElementById("lightbox-img");
+const cerrarLightbox = document.getElementById("lightbox-close");
+const lightboxAnterior = document.getElementById("lightbox-prev");
+const lightboxSiguiente = document.getElementById("lightbox-next");
 
 let imagenesVehiculo = [];
 let indiceImagenActual = 0;
 
 function obtenerIdDeUrl() {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get("id");
+  const parametrosUrl = new URLSearchParams(window.location.search);
+  return parametrosUrl.get("id");
 }
 
 function renderizarVehiculo(vehiculo) {
@@ -34,7 +34,7 @@ function renderizarVehiculo(vehiculo) {
   estatusVehiculo.textContent = vehiculo.estatus || vehiculo.status || "N/A";
   transmisionVehiculo.textContent = vehiculo.transmision || "N/A";
   dueñosVehiculo.textContent = vehiculo.dueños ?? vehiculo.owners ?? "N/A";
-  añoVehiculo.textContent = vehiculo.año || "N/A";
+  añoVehiculo.textContent = vehiculo.anio || vehiculo.año || "N/A";
   descripcionVehiculo.textContent =
     vehiculo.descripcion || vehiculo.description || "";
   precioVehiculo.textContent = `$${vehiculo.precio || 0}`;
@@ -43,8 +43,8 @@ function renderizarVehiculo(vehiculo) {
   imagenesVehiculo = vehiculo.images || vehiculo.imagenes || [];
 
   if (imagenesVehiculo.length > 0) {
-    mainImg.src = imagenesVehiculo[0];
-    thumbnailsContainer.innerHTML = "";
+    imagenPrincipal.src = imagenesVehiculo[0];
+    contenedorMiniaturas.innerHTML = "";
 
     imagenesVehiculo.forEach((imgUrl, index) => {
       const thumb = document.createElement("img");
@@ -57,53 +57,53 @@ function renderizarVehiculo(vehiculo) {
         actualizarImagenPrincipal();
       });
 
-      thumbnailsContainer.appendChild(thumb);
+      contenedorMiniaturas.appendChild(thumb);
     });
   } else {
-    mainImg.alt = "Sin imagen disponible";
+    imagenPrincipal.alt = "Sin imagen disponible";
   }
 }
 
 function actualizarImagenPrincipal() {
-  mainImg.src = imagenesVehiculo[indiceImagenActual];
+  imagenPrincipal.src = imagenesVehiculo[indiceImagenActual];
 
   // Actualizar borde activo en miniaturas
-  const thumbs = thumbnailsContainer.querySelectorAll(".thumb-img");
-  thumbs.forEach((thumb, idx) => {
+  const miniaturas = contenedorMiniaturas.querySelectorAll(".thumb-img");
+  miniaturas.forEach((thumb, idx) => {
     thumb.classList.toggle("active", idx === indiceImagenActual);
   });
 }
 
 // Configuración del Lightbox (Modal)
 function inicializarLightbox() {
-  mainImg.addEventListener("click", () => {
+  imagenPrincipal.addEventListener("click", () => {
     if (imagenesVehiculo.length === 0) return;
-    lightboxImg.src = imagenesVehiculo[indiceImagenActual];
-    lightboxModal.classList.add("active");
+    imagenLightbox.src = imagenesVehiculo[indiceImagenActual];
+    modalLightbox.classList.add("active");
   });
 
-  lightboxClose.addEventListener("click", () => {
-    lightboxModal.classList.remove("active");
+  cerrarLightbox.addEventListener("click", () => {
+    modalLightbox.classList.remove("active");
   });
 
-  lightboxPrev.addEventListener("click", () => {
+  lightboxAnterior.addEventListener("click", () => {
     indiceImagenActual =
       (indiceImagenActual - 1 + imagenesVehiculo.length) %
       imagenesVehiculo.length;
-    lightboxImg.src = imagenesVehiculo[indiceImagenActual];
+    imagenLightbox.src = imagenesVehiculo[indiceImagenActual];
     actualizarImagenPrincipal();
   });
 
-  lightboxNext.addEventListener("click", () => {
+  lightboxSiguiente.addEventListener("click", () => {
     indiceImagenActual = (indiceImagenActual + 1) % imagenesVehiculo.length;
-    lightboxImg.src = imagenesVehiculo[indiceImagenActual];
+    imagenLightbox.src = imagenesVehiculo[indiceImagenActual];
     actualizarImagenPrincipal();
   });
 
   // Cerrar al hacer clic fuera de la foto
-  lightboxModal.addEventListener("click", (e) => {
-    if (e.target === lightboxModal) {
-      lightboxModal.classList.remove("active");
+  modalLightbox.addEventListener("click", (e) => {
+    if (e.target === modalLightbox) {
+      modalLightbox.classList.remove("active");
     }
   });
 }
@@ -113,7 +113,7 @@ async function inicializarVehiculo() {
 
   if (!vehiculoId || vehiculoId === "undefined") {
     alert("ID de vehículo no válido");
-    window.location.href = "./marcas.html";
+    window.location.href = "../../index.html#marcas";
     return;
   }
 

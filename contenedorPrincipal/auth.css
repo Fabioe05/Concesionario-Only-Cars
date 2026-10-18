@@ -1,6 +1,8 @@
-/* Estilos de Registro / Auth Form Layout */
+/* ==========================================
+   ESTILOS COMPARTIDOS DE LOGIN Y REGISTRO
+   ========================================== */
 
-.form {
+.auth-container {
   min-height: calc(100vh - 120px);
   display: flex;
   align-items: center;
@@ -53,10 +55,14 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
   padding: 0.85rem 1rem;
-  color: #ffffff;
+  color: var(--blanco);
   font-size: 0.95rem;
   outline: none;
   transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  border-color: var(--accent-red);
 }
 
 .btn-full {
@@ -81,11 +87,13 @@
   text-decoration: underline;
 }
 
+/* Validación en vivo del formulario de registro */
 .true {
-  outline: 2px solid #2ecc71 !important;
+  outline: 2px solid var(--verde) !important;
 }
+
 .false {
-  outline: 2px solid #e74c3c !important;
+  outline: 2px solid var(--accent-red) !important;
 }
 
 .information {

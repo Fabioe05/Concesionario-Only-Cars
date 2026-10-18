@@ -34,6 +34,11 @@ const vehiculoSchema = new mongoose.Schema(
       },
       lowercase: true,
     },
+    kilometraje: {
+      type: Number,
+      default: 0,
+      min: [0, "El kilometraje no puede ser negativo"],
+    },
     owners: {
       type: Number,
       default: 1,

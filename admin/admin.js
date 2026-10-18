@@ -1,7 +1,7 @@
 // Secciones de vista
 const seccionLista = document.getElementById("seccion-lista");
 const seccionFormulario = document.getElementById("seccion-formulario");
-const tablaVehiculosBody = document.getElementById("tabla-vehiculos-body");
+const cuerpoTablaVehiculos = document.getElementById("tabla-vehiculos-body");
 // Filtros de inventario
 const filtroMarca = document.getElementById("filtro-marca");
 const filtroNombre = document.getElementById("filtro-nombre");
@@ -9,9 +9,10 @@ const btnLimpiarFiltros = document.getElementById("btn-limpiar-filtros");
 // Botones de navegación entre vistas
 const btnCrearNuevo = document.getElementById("btn-crear-nuevo");
 const btnVolverLista = document.getElementById("btn-volver-lista");
-const formTitulo = document.getElementById("form-titulo");
+const tituloFormulario = document.getElementById("form-titulo");
+const btnVolverInicio = document.getElementById("btn-volver-inicio");
 // Formulario y campos
-const formVehiculo = document.getElementById("form-vehiculo");
+const formularioVehiculo = document.getElementById("form-vehiculo");
 const inputVehiculoId = document.getElementById("vehiculo-id");
 const inputMarca = document.getElementById("marca");
 const inputModelo = document.getElementById("modelo");
@@ -20,9 +21,9 @@ const inputKilometraje = document.getElementById("kilometraje");
 const inputMotor = document.getElementById("motor");
 const inputPrecio = document.getElementById("precio");
 const inputTransmision = document.getElementById("transmision");
-const inputOwners = document.getElementById("owners");
-const inputStatus = document.getElementById("status");
-const inputDescription = document.getElementById("description");
+const inputPropietarios = document.getElementById("owners");
+const inputEstatus = document.getElementById("status");
+const inputDescripcion = document.getElementById("description");
 // Modal de detalles
 const modalDetalleVehiculo = document.getElementById("modal-detalle-vehiculo");
 const modalDetalleTitulo = document.getElementById("modal-detalle-titulo");
@@ -37,7 +38,7 @@ const btnModalEditar = document.getElementById("btn-modal-editar");
 const btnModalEliminar = document.getElementById("btn-modal-eliminar");
 const btnModalCerrar = document.getElementById("btn-modal-cerrar");
 // Manejo de imágenes
-const inputImages = document.getElementById("images");
+const inputImagenes = document.getElementById("images");
 const btnLimpiarImagenes = document.getElementById("btn-limpiar-imagenes");
 const divVistaPrevia = document.getElementById("vista-previa");
 // Botones de acción del formulario
@@ -49,6 +50,33 @@ let vehiculoActualDetalle = null;
 let archivosNuevos = [];
 let imagenesExistentes = [];
 let modoFormulario = "POST";
+const MAX_IMAGENES = 10;
+
+// UTILIDADES (formato y normalización de datos)
+/** Precio con separador de miles. */
+function formatearPrecio(valor) {
+  return Number(valor || 0).toLocaleString("en-US");
+}
+
+/** Kilometraje con separador de miles. */
+function formatearKilometraje(valor) {
+  return Number(valor !== undefined ? valor : 0).toLocaleString("en-US");
+}
+
+/** Estatus del vehículo: texto original y clase CSS del badge. */
+function normalizarStatus(valor) {
+  const texto = (valor || "disponible").toString().toLowerCase();
+  if (texto.includes("vend")) return { texto, clase: "vendido" };
+  if (texto.includes("reser")) return { texto, clase: "reservado" };
+  return { texto, clase: "disponible" };
+}
+
+/** Transmisión en texto legible. */
+function formatearTransmision(valor) {
+  return (valor || "automatica").toString().toLowerCase().includes("auto")
+    ? "Automática"
+    : "Manual";
+}
 
 // CAMBIO DE VISTAS (LISTA <-> FORMULARIO)
 function mostrarSeccionLista() {
@@ -65,10 +93,10 @@ function mostrarSeccionFormulario() {
 
 // CARGA, FILTRADO Y RENDERIZADO DEL INVENTARIO
 async function cargarVehiculos() {
-  if (!tablaVehiculosBody) return;
+  if (!cuerpoTablaVehiculos) return;
 
   try {
-    tablaVehiculosBody.innerHTML = `
+    cuerpoTablaVehiculos.innerHTML = `
       <tr>
         <td colspan="10" class="text-center" style="padding: 30px; color: #888; text-align: center;">
           Cargando inventario de vehículos...
@@ -85,7 +113,7 @@ async function cargarVehiculos() {
     aplicarFiltros();
   } catch (error) {
     console.error("Error al cargar vehículos:", error);
-    tablaVehiculosBody.innerHTML = `
+    cuerpoTablaVehiculos.innerHTML = `
       <tr>
         <td colspan="10" style="padding: 30px; text-align: center; color: #f87171;">
           Error de conexión al cargar los vehículos. Por favor, recarga la página.
@@ -194,10 +222,10 @@ function resetearFiltros() {
 }
 
 function renderizarTablaVehiculos(vehiculos) {
-  if (!tablaVehiculosBody) return;
+  if (!cuerpoTablaVehiculos) return;
 
   if (todosLosVehiculos.length === 0) {
-    tablaVehiculosBody.innerHTML = `
+    cuerpoTablaVehiculos.innerHTML = `
       <tr>
         <td colspan="10" style="padding: 40px 20px; text-align: center; color: #aaa;">
           <p style="font-size: 16px; margin-bottom: 12px;">No hay vehículos registrados en el catálogo actualmente.</p>
@@ -211,7 +239,7 @@ function renderizarTablaVehiculos(vehiculos) {
   }
 
   if (vehiculos.length === 0) {
-    tablaVehiculosBody.innerHTML = `
+    cuerpoTablaVehiculos.innerHTML = `
       <tr>
         <td colspan="10" style="padding: 35px 20px; text-align: center; color: #8e8e93;">
           <p style="font-size: 15px; margin-bottom: 8px;">No se encontraron vehículos que coincidan con los filtros seleccionados.</p>
@@ -224,7 +252,7 @@ function renderizarTablaVehiculos(vehiculos) {
     return;
   }
 
-  tablaVehiculosBody.innerHTML = "";
+  cuerpoTablaVehiculos.innerHTML = "";
 
   vehiculos.forEach((vehiculo) => {
     const fila = document.createElement("tr");
@@ -239,41 +267,25 @@ function renderizarTablaVehiculos(vehiculos) {
         ? `<img src="${imagenes[0]}" alt="${vehiculo.modelo}" class="vehiculo-img-thumb" onerror="this.outerHTML='<div class=\\'vehiculo-no-img\\'>Sin foto</div>'" />`
         : `<div class="vehiculo-no-img">Sin foto</div>`;
 
-    // Formato de Precio y Kilometraje
-    const precioFormateado = Number(vehiculo.precio || 0).toLocaleString(
-      "en-US",
+    // Datos formateados y normalizados
+    const precioFormateado = formatearPrecio(vehiculo.precio);
+    const kmFormateado = formatearKilometraje(vehiculo.kilometraje);
+    const { texto: rawStatus, clase: statusClass } = normalizarStatus(
+      vehiculo.status || vehiculo.estatus,
     );
-    const kmFormateado = Number(
-      vehiculo.kilometraje !== undefined ? vehiculo.kilometraje : 0,
-    ).toLocaleString("en-US");
-
-    // Estatus y badge
-    const rawStatus = (
-      vehiculo.status ||
-      vehiculo.estatus ||
-      "disponible"
-    ).toLowerCase();
-    let statusClass = "disponible";
-    if (rawStatus.includes("vend")) statusClass = "vendido";
-    else if (rawStatus.includes("reser")) statusClass = "reservado";
-
-    // Transmisión
-    const rawTrans = (vehiculo.transmision || "automatica").toLowerCase();
-    const transmisionTexto = rawTrans.includes("auto")
-      ? "Automática"
-      : "Manual";
+    const transmisionTexto = formatearTransmision(vehiculo.transmision);
 
     fila.innerHTML = `
-      <td>${imagenHTML}</td>
-      <td><strong>${vehiculo.marca || "N/A"}</strong></td>
-      <td>${vehiculo.modelo || "N/A"}</td>
-      <td>${vehiculo.año || vehiculo.anio || "N/A"}</td>
-      <td>${kmFormateado} km</td>
-      <td>${vehiculo.motor || "N/A"}</td>
-      <td><strong style="color: #ffffff;">$${precioFormateado}</strong></td>
-      <td>${transmisionTexto}</td>
-      <td><span class="status-badge ${statusClass}">${rawStatus}</span></td>
-      <td style="text-align: center;">
+      <td class="td-img" data-label="Foto">${imagenHTML}</td>
+      <td data-label="Marca"><strong>${vehiculo.marca || "N/A"}</strong></td>
+      <td data-label="Modelo">${vehiculo.modelo || "N/A"}</td>
+      <td data-label="Año">${vehiculo.anio || vehiculo.año || "N/A"}</td>
+      <td data-label="Kilometraje">${kmFormateado} km</td>
+      <td data-label="Motor">${vehiculo.motor || "N/A"}</td>
+      <td data-label="Precio"><strong style="color: #ffffff;">$${precioFormateado}</strong></td>
+      <td data-label="Transmisión">${transmisionTexto}</td>
+      <td data-label="Estatus"><span class="status-badge ${statusClass}">${rawStatus}</span></td>
+      <td class="td-acciones">
         <div class="actions-cell">
           <button type="button" class="btn-action btn-view" title="Ver detalles de este vehículo">
             Ver
@@ -306,7 +318,7 @@ function renderizarTablaVehiculos(vehiculos) {
       confirmarYEliminarVehiculo(vehiculo);
     });
 
-    tablaVehiculosBody.appendChild(fila);
+    cuerpoTablaVehiculos.appendChild(fila);
   });
 }
 
@@ -413,7 +425,7 @@ function actualizarVistaPrevia() {
         URL.revokeObjectURL(f._previewUrl);
       }
       archivosNuevos.splice(index, 1);
-      sincronizarInputFiles();
+      sincronizarArchivos();
       actualizarVistaPrevia();
     });
 
@@ -423,11 +435,11 @@ function actualizarVistaPrevia() {
   });
 }
 
-function sincronizarInputFiles() {
+function sincronizarArchivos() {
   const dataTransfer = new DataTransfer();
   archivosNuevos.forEach((file) => dataTransfer.items.add(file));
-  if (inputImages) {
-    inputImages.files = dataTransfer.files;
+  if (inputImagenes) {
+    inputImagenes.files = dataTransfer.files;
   }
 }
 
@@ -439,8 +451,8 @@ function limpiarImagenes() {
   });
   archivosNuevos = [];
   imagenesExistentes = [];
-  if (inputImages) {
-    inputImages.value = "";
+  if (inputImagenes) {
+    inputImagenes.value = "";
   }
   divVistaPrevia.innerHTML = "";
 }
@@ -451,7 +463,7 @@ function limpiarImagenes() {
 function abrirFormularioCrear() {
   modoFormulario = "POST";
   limpiarFormulario();
-  if (formTitulo) formTitulo.textContent = "Registrar Nuevo Vehículo";
+  if (tituloFormulario) tituloFormulario.textContent = "Registrar Nuevo Vehículo";
   if (btnGuardar) btnGuardar.textContent = "Guardar Vehículo";
   mostrarSeccionFormulario();
 }
@@ -470,8 +482,8 @@ async function abrirFormularioEditar(vehiculo) {
 
   const nombreVehiculo =
     `${vehiculo.marca || ""} ${vehiculo.modelo || ""}`.trim();
-  if (formTitulo) {
-    formTitulo.textContent = `Editar Vehículo: ${nombreVehiculo || vehiculoId}`;
+  if (tituloFormulario) {
+    tituloFormulario.textContent = `Editar Vehículo: ${nombreVehiculo || vehiculoId}`;
   }
   if (btnGuardar) {
     btnGuardar.textContent = "Actualizar Vehículo";
@@ -479,7 +491,7 @@ async function abrirFormularioEditar(vehiculo) {
 
   // Rellenar campos del formulario
   if (inputModelo) inputModelo.value = vehiculo.modelo || "";
-  if (inputAño) inputAño.value = vehiculo.año || vehiculo.anio || "";
+  if (inputAño) inputAño.value = vehiculo.anio || vehiculo.año || "";
   if (inputKilometraje) {
     inputKilometraje.value =
       vehiculo.kilometraje !== undefined ? vehiculo.kilometraje : 0;
@@ -494,18 +506,18 @@ async function abrirFormularioEditar(vehiculo) {
   }
 
   // Normalizar Dueños
-  if (inputOwners) {
-    inputOwners.value = vehiculo.owners || vehiculo.dueños || 1;
+  if (inputPropietarios) {
+    inputPropietarios.value = vehiculo.owners || vehiculo.dueños || 1;
   }
 
   // Normalizar Estatus
-  if (inputStatus && (vehiculo.status || vehiculo.estatus)) {
-    inputStatus.value = (vehiculo.status || vehiculo.estatus).toLowerCase();
+  if (inputEstatus && (vehiculo.status || vehiculo.estatus)) {
+    inputEstatus.value = (vehiculo.status || vehiculo.estatus).toLowerCase();
   }
 
   // Normalizar Descripción
-  if (inputDescription) {
-    inputDescription.value = vehiculo.description || vehiculo.descripcion || "";
+  if (inputDescripcion) {
+    inputDescripcion.value = vehiculo.description || vehiculo.descripcion || "";
   }
 
   // Cargar lista de marcas seleccionando la marca del vehículo
@@ -519,7 +531,7 @@ async function abrirFormularioEditar(vehiculo) {
       ? [...vehiculo.imagenes]
       : [];
   archivosNuevos = [];
-  if (inputImages) inputImages.value = "";
+  if (inputImagenes) inputImagenes.value = "";
   actualizarVistaPrevia();
 
   mostrarSeccionFormulario();
@@ -535,7 +547,7 @@ function abrirModalDetalle(vehiculo) {
   const vehiculoId = vehiculo.id || vehiculo._id;
   const nombreVehiculo =
     `${vehiculo.marca || ""} ${vehiculo.modelo || ""}`.trim() || "Vehículo";
-  const añoVehiculo = vehiculo.año || vehiculo.anio || "";
+  const añoVehiculo = vehiculo.anio || vehiculo.año || "";
 
   if (modalDetalleTitulo) {
     modalDetalleTitulo.textContent = `${nombreVehiculo} ${añoVehiculo ? `(${añoVehiculo})` : ""}`;
@@ -552,22 +564,12 @@ function abrirModalDetalle(vehiculo) {
         ? vehiculo.imagenes
         : [];
 
-  const precioFormateado = Number(vehiculo.precio || 0).toLocaleString("en-US");
-  const kmFormateado = Number(
-    vehiculo.kilometraje !== undefined ? vehiculo.kilometraje : 0,
-  ).toLocaleString("en-US");
-
-  const rawStatus = (
-    vehiculo.status ||
-    vehiculo.estatus ||
-    "disponible"
-  ).toLowerCase();
-  let statusClass = "disponible";
-  if (rawStatus.includes("vend")) statusClass = "vendido";
-  else if (rawStatus.includes("reser")) statusClass = "reservado";
-
-  const rawTrans = (vehiculo.transmision || "automatica").toLowerCase();
-  const transmisionTexto = rawTrans.includes("auto") ? "Automática" : "Manual";
+  const precioFormateado = formatearPrecio(vehiculo.precio);
+  const kmFormateado = formatearKilometraje(vehiculo.kilometraje);
+  const { texto: rawStatus, clase: statusClass } = normalizarStatus(
+    vehiculo.status || vehiculo.estatus,
+  );
+  const transmisionTexto = formatearTransmision(vehiculo.transmision);
 
   let imagenesHTML = "";
   if (imagenes.length > 0) {
@@ -616,7 +618,7 @@ function abrirModalDetalle(vehiculo) {
         </div>
         <div class="detalle-card">
           <span class="detalle-label">Año</span>
-          <span class="detalle-valor">${vehiculo.año || vehiculo.anio || "N/A"}</span>
+          <span class="detalle-valor">${vehiculo.anio || vehiculo.año || "N/A"}</span>
         </div>
         <div class="detalle-card">
           <span class="detalle-label">Precio</span>
@@ -755,9 +757,9 @@ async function guardarVehiculo() {
     return;
   }
 
-  if (!inputDescription.value.trim()) {
+  if (!inputDescripcion.value.trim()) {
     alert("Por favor ingresa una descripción para el vehículo.");
-    inputDescription.focus();
+    inputDescripcion.focus();
     return;
   }
 
@@ -770,27 +772,21 @@ async function guardarVehiculo() {
   if (marcaId) {
     formData.append("marca_id", marcaId);
   }
-
   formData.append("modelo", inputModelo.value.trim());
-  formData.append("año", inputAño.value.trim());
   formData.append("anio", inputAño.value.trim());
   formData.append("kilometraje", inputKilometraje.value.trim() || "0");
   formData.append("motor", inputMotor.value.trim());
   formData.append("precio", inputPrecio.value.trim());
   formData.append("transmision", inputTransmision.value);
-  formData.append("owners", inputOwners.value.trim() || "1");
-  formData.append("dueños", inputOwners.value.trim() || "1");
-  formData.append("status", inputStatus.value);
-  formData.append("estatus", inputStatus.value);
-  formData.append("description", inputDescription.value.trim());
-  formData.append("descripcion", inputDescription.value.trim());
+  formData.append("owners", inputPropietarios.value.trim() || "1");
+  formData.append("status", inputEstatus.value);
+  formData.append("description", inputDescripcion.value.trim());
 
   // Mantener imágenes existentes si estamos modificando
   formData.append("keepExistingImages", JSON.stringify(imagenesExistentes));
 
   // Agregar nuevos archivos de imagen
   archivosNuevos.forEach((file) => {
-    formData.append("images", file);
     formData.append("imagenes", file);
   });
 
@@ -800,7 +796,14 @@ async function guardarVehiculo() {
       body: formData,
     });
 
-    const data = await res.json();
+    // La respuesta puede no ser JSON (p. ej. un 500 en HTML de Express).
+    const texto = await res.text();
+    let data = {};
+    try {
+      data = texto ? JSON.parse(texto) : {};
+    } catch {
+      data = { error: `Error del servidor (${res.status}).` };
+    }
 
     if (res.ok) {
       alert(
@@ -832,7 +835,7 @@ async function guardarVehiculo() {
 // 11. LIMPIAR FORMULARIO
 // ==========================================
 function limpiarFormulario() {
-  if (formVehiculo) formVehiculo.reset();
+  if (formularioVehiculo) formularioVehiculo.reset();
   if (inputVehiculoId) inputVehiculoId.value = "";
   limpiarImagenes();
   cargarMarcas();
@@ -896,11 +899,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Manejador de selección de imágenes
-  if (inputImages) {
-    inputImages.addEventListener("change", (e) => {
+  if (inputImagenes) {
+    inputImagenes.addEventListener("change", (e) => {
       const nuevosArchivos = Array.from(e.target.files);
-      archivosNuevos = [...archivosNuevos, ...nuevosArchivos];
-      sincronizarInputFiles();
+      const espacio = Math.max(0, MAX_IMAGENES - archivosNuevos.length);
+
+      if (nuevosArchivos.length > espacio) {
+        alert(
+          `Puedes subir un máximo de ${MAX_IMAGENES} imágenes por vehículo.`,
+        );
+      }
+
+      archivosNuevos = [...archivosNuevos, ...nuevosArchivos.slice(0, espacio)];
+      sincronizarArchivos();
       actualizarVistaPrevia();
     });
   }
@@ -942,6 +953,12 @@ document.addEventListener("DOMContentLoaded", () => {
         cerrarModalDetalle();
         await confirmarYEliminarVehiculo(vehiculo);
       }
+    });
+  }
+
+  if (btnVolverInicio) {
+    btnVolverInicio.addEventListener("click", () => {
+      window.location.href = "../index.html";
     });
   }
 
