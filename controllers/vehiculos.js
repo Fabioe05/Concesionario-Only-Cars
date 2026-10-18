@@ -225,7 +225,7 @@ vehiculosRouter.delete("/:id", userExtractor, requireAdmin, async (req, res) => 
       return res.status(404).json({ mensaje: "Vehículo no encontrado" });
     }
 
-    // Borramos del disco las imágenes del vehículo eliminado.
+    // Borramos las imágenes del vehículo eliminado (locales y de la base de datos).
     await borrarImagenes(vehiculoEliminado.images);
 
     return res.json({

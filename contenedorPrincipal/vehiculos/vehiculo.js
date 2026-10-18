@@ -31,16 +31,15 @@ function renderizarVehiculo(vehiculo) {
   tituloVehiculo.textContent =
     `${vehiculo.marca || ""} ${vehiculo.modelo}`.trim();
   motorVehiculo.textContent = vehiculo.motor || "N/A";
-  estatusVehiculo.textContent = vehiculo.estatus || vehiculo.status || "N/A";
+  estatusVehiculo.textContent = vehiculo.status || "N/A";
   transmisionVehiculo.textContent = vehiculo.transmision || "N/A";
-  dueñosVehiculo.textContent = vehiculo.dueños ?? vehiculo.owners ?? "N/A";
-  añoVehiculo.textContent = vehiculo.anio || vehiculo.año || "N/A";
-  descripcionVehiculo.textContent =
-    vehiculo.descripcion || vehiculo.description || "";
+  dueñosVehiculo.textContent = vehiculo.owners ?? "N/A";
+  añoVehiculo.textContent = vehiculo.anio || "N/A";
+  descripcionVehiculo.textContent = vehiculo.description || "";
   precioVehiculo.textContent = `$${vehiculo.precio || 0}`;
 
   // Galería de imágenes
-  imagenesVehiculo = vehiculo.images || vehiculo.imagenes || [];
+  imagenesVehiculo = vehiculo.images || [];
 
   if (imagenesVehiculo.length > 0) {
     imagenPrincipal.src = imagenesVehiculo[0];

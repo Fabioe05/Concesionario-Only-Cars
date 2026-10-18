@@ -135,7 +135,7 @@ async function poblarFiltroMarcas(vehiculos = []) {
       if (res.ok) {
         const marcasData = await res.json();
         marcasList = marcasData
-          .map((m) => m.name || m.nombre || m)
+          .map((m) => m.name)
           .filter(Boolean);
       }
     } catch (e) {
@@ -180,11 +180,7 @@ function aplicarFiltros() {
     // 1. Filtro por marca
     if (marcaFiltro) {
       const marcaVehiculo = (vehiculo.marca || "").trim().toLowerCase();
-      const marcaIdVehiculo = (vehiculo.marca_id || "")
-        .toString()
-        .trim()
-        .toLowerCase();
-      if (marcaVehiculo !== marcaFiltro && marcaIdVehiculo !== marcaFiltro) {
+      if (marcaVehiculo !== marcaFiltro) {
         return false;
       }
     }
@@ -193,12 +189,8 @@ function aplicarFiltros() {
     if (textoFiltro) {
       const marca = (vehiculo.marca || "").toLowerCase();
       const modelo = (vehiculo.modelo || "").toLowerCase();
-      const descripcion = (
-        vehiculo.description ||
-        vehiculo.descripcion ||
-        ""
-      ).toLowerCase();
-      const año = (vehiculo.año || vehiculo.anio || "")
+      const descripcion = (vehiculo.description || "").toLowerCase();
+      const año = (vehiculo.anio || "")
         .toString()
         .toLowerCase();
       const motor = (vehiculo.motor || "").toLowerCase();
@@ -258,10 +250,10 @@ function renderizarTablaVehiculos(vehiculos) {
     const fila = document.createElement("tr");
 
     // ID normalizado
-    const vehiculoId = vehiculo.id || vehiculo._id;
+    const vehiculoId = vehiculo.id;
 
     // Imágenes
-    const imagenes = vehiculo.images || vehiculo.imagenes || [];
+    const imagenes = vehiculo.images || [];
     const imagenHTML =
       imagenes.length > 0
         ? `<img src="${imagenes[0]}" alt="${vehiculo.modelo}" class="vehiculo-img-thumb" onerror="this.outerHTML='<div class=\\'vehiculo-no-img\\'>Sin foto</div>'" />`
@@ -271,7 +263,7 @@ function renderizarTablaVehiculos(vehiculos) {
     const precioFormateado = formatearPrecio(vehiculo.precio);
     const kmFormateado = formatearKilometraje(vehiculo.kilometraje);
     const { texto: rawStatus, clase: statusClass } = normalizarStatus(
-      vehiculo.status || vehiculo.estatus,
+      vehiculo.status,
     );
     const transmisionTexto = formatearTransmision(vehiculo.transmision);
 
@@ -279,7 +271,7 @@ function renderizarTablaVehiculos(vehiculos) {
       <td class="td-img" data-label="Foto">${imagenHTML}</td>
       <td data-label="Marca"><strong>${vehiculo.marca || "N/A"}</strong></td>
       <td data-label="Modelo">${vehiculo.modelo || "N/A"}</td>
-      <td data-label="Año">${vehiculo.anio || vehiculo.año || "N/A"}</td>
+      <td data-label="Año">${vehiculo.anio || "N/A"}</td>
       <td data-label="Kilometraje">${kmFormateado} km</td>
       <td data-label="Motor">${vehiculo.motor || "N/A"}</td>
       <td data-label="Precio"><strong style="color: #ffffff;">$${precioFormateado}</strong></td>
@@ -341,13 +333,12 @@ async function cargarMarcas(marcaSeleccionada = "") {
     marcas.forEach((m) => {
       const option = document.createElement("option");
       option.value = m.name;
-      option.dataset.id = m.id || m._id;
+      option.dataset.id = m.id;
       option.textContent = m.name;
       if (
         marcaSeleccionada &&
         (m.name.toLowerCase() === marcaSeleccionada.toString().toLowerCase() ||
-          (m.id && m.id.toString() === marcaSeleccionada.toString()) ||
-          (m._id && m._id.toString() === marcaSeleccionada.toString()))
+          (m.id && m.id.toString() === marcaSeleccionada.toString()))
       ) {
         option.selected = true;
       }
@@ -477,7 +468,7 @@ async function abrirFormularioEditar(vehiculo) {
   modoFormulario = "PUT";
   limpiarImagenes();
 
-  const vehiculoId = vehiculo.id || vehiculo._id;
+  const vehiculoId = vehiculo.id;
   if (inputVehiculoId) inputVehiculoId.value = vehiculoId;
 
   const nombreVehiculo =
@@ -491,7 +482,7 @@ async function abrirFormularioEditar(vehiculo) {
 
   // Rellenar campos del formulario
   if (inputModelo) inputModelo.value = vehiculo.modelo || "";
-  if (inputAño) inputAño.value = vehiculo.anio || vehiculo.año || "";
+  if (inputAño) inputAño.value = vehiculo.anio || "";
   if (inputKilometraje) {
     inputKilometraje.value =
       vehiculo.kilometraje !== undefined ? vehiculo.kilometraje : 0;
@@ -507,29 +498,27 @@ async function abrirFormularioEditar(vehiculo) {
 
   // Normalizar Dueños
   if (inputPropietarios) {
-    inputPropietarios.value = vehiculo.owners || vehiculo.dueños || 1;
+    inputPropietarios.value = vehiculo.owners || 1;
   }
 
   // Normalizar Estatus
-  if (inputEstatus && (vehiculo.status || vehiculo.estatus)) {
-    inputEstatus.value = (vehiculo.status || vehiculo.estatus).toLowerCase();
+  if (inputEstatus && vehiculo.status) {
+    inputEstatus.value = vehiculo.status.toLowerCase();
   }
 
   // Normalizar Descripción
   if (inputDescripcion) {
-    inputDescripcion.value = vehiculo.description || vehiculo.descripcion || "";
+    inputDescripcion.value = vehiculo.description || "";
   }
 
   // Cargar lista de marcas seleccionando la marca del vehículo
-  const marcaValor = vehiculo.marca || vehiculo.marca_id;
+  const marcaValor = vehiculo.marca;
   await cargarMarcas(marcaValor);
 
   // Cargar imágenes existentes
   imagenesExistentes = Array.isArray(vehiculo.images)
     ? [...vehiculo.images]
-    : Array.isArray(vehiculo.imagenes)
-      ? [...vehiculo.imagenes]
-      : [];
+    : [];
   archivosNuevos = [];
   if (inputImagenes) inputImagenes.value = "";
   actualizarVistaPrevia();
@@ -544,10 +533,10 @@ function abrirModalDetalle(vehiculo) {
   if (!vehiculo) return;
   vehiculoActualDetalle = vehiculo;
 
-  const vehiculoId = vehiculo.id || vehiculo._id;
+  const vehiculoId = vehiculo.id;
   const nombreVehiculo =
     `${vehiculo.marca || ""} ${vehiculo.modelo || ""}`.trim() || "Vehículo";
-  const añoVehiculo = vehiculo.anio || vehiculo.año || "";
+  const añoVehiculo = vehiculo.anio || "";
 
   if (modalDetalleTitulo) {
     modalDetalleTitulo.textContent = `${nombreVehiculo} ${añoVehiculo ? `(${añoVehiculo})` : ""}`;
@@ -560,14 +549,12 @@ function abrirModalDetalle(vehiculo) {
   const imagenes =
     Array.isArray(vehiculo.images) && vehiculo.images.length > 0
       ? vehiculo.images
-      : Array.isArray(vehiculo.imagenes) && vehiculo.imagenes.length > 0
-        ? vehiculo.imagenes
-        : [];
+      : [];
 
   const precioFormateado = formatearPrecio(vehiculo.precio);
   const kmFormateado = formatearKilometraje(vehiculo.kilometraje);
   const { texto: rawStatus, clase: statusClass } = normalizarStatus(
-    vehiculo.status || vehiculo.estatus,
+    vehiculo.status,
   );
   const transmisionTexto = formatearTransmision(vehiculo.transmision);
 
@@ -618,7 +605,7 @@ function abrirModalDetalle(vehiculo) {
         </div>
         <div class="detalle-card">
           <span class="detalle-label">Año</span>
-          <span class="detalle-valor">${vehiculo.anio || vehiculo.año || "N/A"}</span>
+          <span class="detalle-valor">${vehiculo.anio || "N/A"}</span>
         </div>
         <div class="detalle-card">
           <span class="detalle-label">Precio</span>
@@ -638,7 +625,7 @@ function abrirModalDetalle(vehiculo) {
         </div>
         <div class="detalle-card">
           <span class="detalle-label">Número de Dueños</span>
-          <span class="detalle-valor">${vehiculo.owners || vehiculo.dueños || 1}</span>
+          <span class="detalle-valor">${vehiculo.owners || 1}</span>
         </div>
         <div class="detalle-card">
           <span class="detalle-label">Estatus</span>
@@ -649,7 +636,7 @@ function abrirModalDetalle(vehiculo) {
       <div class="detalle-seccion-descripcion">
         <h4 class="detalle-seccion-titulo">Descripción</h4>
         <div class="detalle-descripcion-texto">
-          ${vehiculo.description || vehiculo.descripcion || "Sin descripción proporcionada."}
+          ${vehiculo.description || "Sin descripción proporcionada."}
         </div>
       </div>
     `;
@@ -686,7 +673,7 @@ function cerrarModalDetalle() {
 // 10. ELIMINAR VEHÍCULO CON CONFIRMACIÓN
 // ==========================================
 async function confirmarYEliminarVehiculo(vehiculo) {
-  const vehiculoId = vehiculo.id || vehiculo._id;
+  const vehiculoId = vehiculo.id;
   const nombre =
     `${vehiculo.marca || ""} ${vehiculo.modelo || ""}`.trim() || vehiculoId;
 

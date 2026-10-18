@@ -1,7 +1,7 @@
 const multer = require("multer");
 
 // Las imágenes ya no se escriben en disco: Multer las deja en memoria
-// (req.files[i].buffer) y el controlador las sube a Cloudinary.
+// (req.files[i].buffer) y el controlador las guarda en MongoDB.
 const upload = multer({
   storage: multer.memoryStorage(),
   // Máximo 5 MB por imagen.

@@ -28,8 +28,8 @@ function aNumero(valor) {
  * Solo muestra marca, modelo y precio (el resto va en "Ver Detalle").
  */
 function crearTarjetaVehiculo(vehiculo) {
-  const vehiculoId = vehiculo._id || vehiculo.id;
-  const imagenes = vehiculo.images || vehiculo.imagenes || [];
+  const vehiculoId = vehiculo.id;
+  const imagenes = vehiculo.images || [];
   const imagenHTML =
     imagenes.length > 0
       ? `<img src="${imagenes[0]}" alt="${vehiculo.modelo || "Vehículo"}" onerror="this.parentElement.textContent = 'Sin imagen';" />`
@@ -56,7 +56,7 @@ function crearTarjetaVehiculo(vehiculo) {
 function ordenarVehiculos(lista) {
   const criterio = selectOrden ? selectOrden.value : "precio-desc";
   const copia = [...lista];
-  const anioDe = (v) => aNumero(v.anio || v.año);
+  const anioDe = (v) => aNumero(v.anio);
 
   switch (criterio) {
     case "precio-desc":

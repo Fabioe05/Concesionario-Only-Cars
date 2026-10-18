@@ -234,25 +234,6 @@ html {
   filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.65));
 }
 
-.hero-logo-text {
-  display: none;
-  font-family: var(--font-title);
-  font-style: italic;
-  font-weight: 900;
-  font-size: clamp(2.2rem, 8vw, 4rem);
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: var(--blanco);
-}
-
-.hero-logo-text span {
-  color: var(--accent-red);
-}
-
-.hero-logo-wrap.logo-fallback .hero-logo-text {
-  display: inline-block;
-}
-
 .hero-tagline {
   color: var(--text-muted);
   font-size: clamp(0.95rem, 2.2vw, 1.15rem);

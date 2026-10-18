@@ -20,8 +20,8 @@ const mejoresOfertas = document.getElementById("mejores-ofertas");
  * Construye el HTML de la tarjeta de una oferta.
  */
 function crearTarjetaOferta(vehiculo, indice) {
-  const vehiculoId = vehiculo._id || vehiculo.id;
-  const imagenes = vehiculo.images || vehiculo.imagenes || [];
+  const vehiculoId = vehiculo.id;
+  const imagenes = vehiculo.images || [];
   const nombre = `${vehiculo.marca || ""} ${vehiculo.modelo || ""}`.trim();
 
   const imagenHTML =
