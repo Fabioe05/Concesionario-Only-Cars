@@ -11,6 +11,10 @@ const btnCorreo = document.getElementById("btn-enviar-correo");
 // Selectores para la sección de mejores ofertas
 const mejoresOfertas = document.getElementById("mejores-ofertas");
 
+// Selectores para la sección de marcas
+const gridMarcas = document.getElementById("grid-marcas");
+const tituloMarcas = document.getElementById("marcas");
+
 // ==========================================
 // 2. DATOS Y FUNCIONES PRINCIPALES
 // ==========================================
@@ -44,33 +48,82 @@ function crearTarjetaOferta(vehiculo, indice) {
 }
 
 /**
- * Carga los 3 vehículos de menor precio (sin distinción de marca).
+ * Pinta las 3 ofertas de menor precio (sin distinción de marca).
  */
-async function cargarMejoresOfertas() {
+function renderizarMejoresOfertas(vehiculos) {
   if (!mejoresOfertas) return;
 
+  const ofertas = [...vehiculos]
+    .sort((a, b) => Number(a.precio || 0) - Number(b.precio || 0))
+    .slice(0, 3);
+
+  if (ofertas.length === 0) {
+    mejoresOfertas.innerHTML =
+      '<p class="msg-vacio">No hay vehículos disponibles por ahora.</p>';
+    return;
+  }
+
+  mejoresOfertas.innerHTML = ofertas.map(crearTarjetaOferta).join("");
+  activarAnimaciones();
+}
+
+// --- SECCIÓN MARCAS ---
+/**
+ * Deja en la parrilla solo las marcas que tienen vehículos registrados.
+ * Los 16 bloques del HTML son el "catálogo" de logos: aquí solo se quitan
+ * los que no tienen stock. Al registrar un vehículo de una marca oculta,
+ * vuelve a aparecer sola en la siguiente carga de la página.
+ */
+function filtrarMarcasConStock(vehiculos) {
+  if (!gridMarcas) return;
+
+  const marcasConStock = new Set(
+    vehiculos.map((v) => (v.marca || "").trim().toLowerCase()).filter(Boolean),
+  );
+
+  gridMarcas.querySelectorAll(".brand-item").forEach((marcaItem) => {
+    const nombre = (marcaItem.getAttribute("aria-label") || "")
+      .trim()
+      .toLowerCase();
+    if (!marcasConStock.has(nombre)) marcaItem.remove();
+  });
+
+  const visibles = gridMarcas.querySelectorAll(".brand-item");
+
+  // Si no queda ninguna marca, se oculta también el título de la sección.
+  if (visibles.length === 0) {
+    if (tituloMarcas) tituloMarcas.classList.add("oculto");
+    gridMarcas.classList.add("oculto");
+    return;
+  }
+
+  // Renumera el escalonado de la animación (1, 2, 3, 1, 2, 3...).
+  visibles.forEach((item, indice) => {
+    item.setAttribute("data-delay", String((indice % 3) + 1));
+  });
+}
+
+/**
+ * Descarga los vehículos una sola vez y alimenta las secciones que dependen
+ * de ellos: mejores ofertas y marcas con stock.
+ */
+async function cargarDatosDeLaPortada() {
   try {
     const res = await fetch("/api/vehiculos");
     if (!res.ok) throw new Error("No se pudieron cargar los vehículos");
     const data = await res.json();
     const vehiculos = Array.isArray(data) ? data : [];
 
-    const ofertas = [...vehiculos]
-      .sort((a, b) => Number(a.precio || 0) - Number(b.precio || 0))
-      .slice(0, 3);
-
-    if (ofertas.length === 0) {
-      mejoresOfertas.innerHTML =
-        '<p class="msg-vacio">No hay vehículos disponibles por ahora.</p>';
-      return;
-    }
-
-    mejoresOfertas.innerHTML = ofertas.map(crearTarjetaOferta).join("");
-    activarAnimaciones();
+    renderizarMejoresOfertas(vehiculos);
+    filtrarMarcasConStock(vehiculos);
   } catch (error) {
-    console.error("Error al cargar las mejores ofertas:", error);
-    mejoresOfertas.innerHTML =
-      '<p class="msg-vacio">No se pudieron cargar las ofertas.</p>';
+    console.error("Error al cargar los vehículos de la portada:", error);
+    if (mejoresOfertas) {
+      mejoresOfertas.innerHTML =
+        '<p class="msg-vacio">No se pudieron cargar las ofertas.</p>';
+    }
+    // Si falla la conexión se dejan las 16 marcas tal cual:
+    // es preferible eso a mostrar la sección de marcas vacía.
   }
 }
 
@@ -191,8 +244,8 @@ document.addEventListener("DOMContentLoaded", () => {
   ajustarAlturaHero();
   window.addEventListener("resize", ajustarAlturaHero);
 
-  // Cargar las mejores ofertas (3 vehículos de menor precio)
-  cargarMejoresOfertas();
+  // Cargar los vehículos de la portada (ofertas + marcas con stock)
+  cargarDatosDeLaPortada();
 
   // Activar los eventos de los botones de contacto
   if (btnWhatsapp) {

@@ -533,6 +533,14 @@ html.js .reveal[data-delay="3"] {
   opacity: 0.95;
 }
 
+/* La sección de marcas se oculta si ninguna marca tiene vehículos.
+   Se usan dos clases por selector para ganarle a "display: flex" de
+   .grid-brands sin depender del orden de las reglas en el archivo. */
+.section-title.oculto,
+.grid-brands.oculto {
+  display: none;
+}
+
 /* Sección de modelos de la marca seleccionada */
 .modelos-header {
   display: flex;

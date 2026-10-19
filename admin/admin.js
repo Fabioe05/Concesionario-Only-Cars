@@ -346,18 +346,7 @@ async function cargarMarcas(marcaSeleccionada = "") {
     });
   } catch (error) {
     console.error("Error al cargar marcas:", error);
-    inputMarca.innerHTML = `
-      <option value="">Seleccione una marca...</option>
-      <option value="Kia">Kia</option>
-      <option value="Chevrolet">Chevrolet</option>
-      <option value="Toyota">Toyota</option>
-      <option value="Honda">Honda</option>
-      <option value="Fiat">Fiat</option>
-      <option value="Hyundai">Hyundai</option>
-      <option value="BMW">BMW</option>
-      <option value="Renault">Renault</option>
-      <option value="Volkswagen">Volkswagen</option>
-    `;
+    inputMarca.innerHTML = `<option value="">Seleccione una marca...</option>`;
   }
 }
 
