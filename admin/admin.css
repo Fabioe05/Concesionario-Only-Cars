@@ -52,6 +52,13 @@ body {
   animation: modalScaleIn 0.22s ease-out;
 }
 
+/* VISTAS QUE EMPIEZAN OCULTAS (las muestra el JS al navegar) */
+#seccion-formulario,
+#seccion-marcas,
+#modal-detalle-vehiculo {
+  display: none;
+}
+
 /* ENCABEZADOS Y BARRAS */
 .admin-header,
 .form-header-bar,
@@ -280,7 +287,7 @@ input[type="file"] {
   font-size: 11.5px;
 }
 .btn-action.btn-view {
-  background-color: var(--bg-secundario);
+  background-color: var(--gris);
 }
 .btn-action.btn-view:hover {
   background-color: #2e2e38;
@@ -376,6 +383,51 @@ input[type="file"] {
 .vehiculos-table tr:hover {
   background-color: #22222a;
 }
+/* La columna de acciones del listado: centrada y con sitio para los 3 botones */
+#seccion-lista .vehiculos-table th:last-child {
+  text-align: center;
+  min-width: 170px;
+}
+/* El precio del listado, en blanco para que destaque */
+.celda-precio {
+  color: var(--blanco);
+}
+
+/* MENSAJES DENTRO DE LAS TABLAS (cargando, vacío, error) */
+.vehiculos-table td.tabla-mensaje {
+  padding: 30px;
+  text-align: center;
+  color: var(--gris-oscuro);
+}
+.vehiculos-table td.tabla-mensaje--vacio {
+  padding: 22px 10px;
+}
+.vehiculos-table td.tabla-mensaje--error {
+  color: #f87171;
+}
+/* "No hay vehículos en el catálogo" (lleva botón para crear el primero) */
+.vehiculos-table td.tabla-mensaje--catalogo {
+  padding: 40px 20px;
+  color: #aaa;
+}
+/* "Ningún vehículo coincide con los filtros" */
+.vehiculos-table td.tabla-mensaje--filtros {
+  padding: 35px 20px;
+}
+.tabla-mensaje__titulo {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+.tabla-mensaje--filtros .tabla-mensaje__titulo {
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+.tabla-mensaje--filtros .btn-limpiar-filtros {
+  margin-top: 10px;
+}
+.vehiculos-table td[colspan]::before {
+  content: none;
+}
 
 /* IMÁGENES Y BADGES */
 .vehiculo-img-thumb,
@@ -462,6 +514,20 @@ input[type="file"] {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+/* Sustituye a la foto principal del modal cuando ésta no carga */
+.detalle-no-img {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: var(--bg-secundario);
+  border: 1px dashed var(--borde-3);
+  border-radius: 6px;
+  color: var(--gris-oscuro);
+  font-size: 14px;
 }
 .detalle-thumbnails {
   display: flex;
@@ -579,6 +645,154 @@ input[type="file"] {
 }
 .preview-card.existente {
   border-color: var(--rojo);
+}
+
+/* VISTA 3: GESTIÓN DE MARCAS (BLOQUE EN DOS COLUMNAS) */
+#seccion-marcas {
+  max-width: 560px;
+  margin: 0 auto; /* apilada: el bloque queda centrado en el panel */
+}
+#seccion-marcas .form-header-bar {
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+}
+#seccion-marcas .form-titulo {
+  font-size: 19px;
+}
+#seccion-marcas .admin-layout {
+  gap: 10px;
+  align-items: flex-end;
+  flex-wrap: nowrap;
+  margin-bottom: 24px;
+}
+#seccion-marcas .form-section {
+  flex: 0 1 auto;
+}
+#seccion-marcas .actions-section {
+  flex: 0 0 auto;
+  min-width: 0;
+  padding-top: 0;
+}
+#seccion-marcas .actions-section .btn-admin {
+  width: auto;
+  padding: 12px 18px;
+  white-space: nowrap;
+}
+#seccion-marcas input[type="text"] {
+  width: 240px;
+}
+#seccion-marcas .table-responsive {
+  margin-top: 0;
+}
+/* Rótulo de cada grupo (con vehículos / sin vehículos) */
+.marcas-rotulo {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-bottom: 9px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--gris-claro);
+}
+.marcas-rotulo--tenue {
+  color: var(--gris-oscuro);
+}
+.marcas-cuenta {
+  font-size: 13px;
+  color: var(--rojo);
+}
+.marcas-rotulo--tenue .marcas-cuenta {
+  color: var(--gris-oscuro);
+}
+/* Los dos grupos: una columna por defecto, dos a partir de 1024 px */
+.marcas-columnas {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+  align-items: start;
+}
+/* Desde 1024 px: dos columnas y las filas más apretadas */
+@media (min-width: 1024px) {
+  #seccion-marcas {
+    max-width: 1040px;
+    margin: 0; /* en dos columnas se queda como estaba */
+  }
+  #seccion-marcas .admin-layout {
+    margin-bottom: 26px;
+  }
+  .marcas-columnas {
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+  /* La tabla de vehículos se ve en tarjetas por debajo de 1201 px (tiene 10 columnas);
+     en esta vista sí cabe la tabla, por eso aquí vuelve a su formato normal */
+  #seccion-marcas .vehiculos-table {
+    display: table;
+    table-layout: fixed;
+    font-size: 12.5px;
+  }
+  #seccion-marcas .vehiculos-table th,
+  #seccion-marcas .vehiculos-table td:not([colspan]) {
+    padding: 7px 10px;
+  }
+  /* "Vehículos" y "Acciones" miden lo mismo en las dos tablas: la de acciones queda a la
+     misma altura y la de la marca se lleva el hueco que sobra */
+  #seccion-marcas .tabla-marcas-con th:nth-child(2),
+  #seccion-marcas .tabla-marcas-con th:nth-child(3),
+  #seccion-marcas .tabla-marcas-sin th:nth-child(2) {
+    width: 130px;
+  }
+
+  /* Lo mismo para las celdas y filas, que la vista de tarjetas pone en bloque */
+  #seccion-marcas .table-responsive {
+    overflow-x: auto;
+    border: 1px solid var(--borde-1);
+    border-radius: 6px;
+  }
+  #seccion-marcas .vehiculos-table thead {
+    display: table-header-group;
+  }
+  #seccion-marcas .vehiculos-table tbody {
+    display: table-row-group;
+  }
+  #seccion-marcas .vehiculos-table tr {
+    display: table-row;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin-bottom: 0;
+  }
+  #seccion-marcas .vehiculos-table tr:hover {
+    background-color: #22222a;
+  }
+  #seccion-marcas .vehiculos-table th,
+  #seccion-marcas .vehiculos-table td {
+    display: table-cell;
+  }
+  #seccion-marcas .vehiculos-table td {
+    border-bottom: 1px solid var(--borde-1);
+    text-align: left;
+  }
+  #seccion-marcas .vehiculos-table td::before {
+    content: none;
+  }
+  #seccion-marcas .vehiculos-table td.td-acciones,
+  #seccion-marcas .vehiculos-table td[colspan] {
+    text-align: center;
+  }
+  #seccion-marcas .vehiculos-table td.td-acciones .actions-cell {
+    display: block;
+    width: auto;
+  }
+  #seccion-marcas .vehiculos-table td.td-acciones .btn-action {
+    flex: none;
+    max-width: none;
+    font-size: 11.5px;
+    padding: 7px 12px;
+  }
 }
 
 /* ANIMACIONES Y RESPONSIVE */
@@ -718,6 +932,16 @@ input[type="file"] {
   .form-section,
   .actions-section {
     min-width: 0;
+    width: 100%;
+  }
+
+  /* VISTA DE MARCAS: en pantallas estrechas el campo y el botón se apilan */
+  #seccion-marcas .admin-layout {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+  #seccion-marcas input[type="text"],
+  #seccion-marcas .actions-section .btn-admin {
     width: 100%;
   }
 

@@ -304,34 +304,36 @@ html {
   line-height: 1.6;
 }
 
-/* 5.2 APARICIÓN AL HACER SCROLL (solo si hay JS) */
-html.js .reveal {
-  opacity: 0;
-  transform: translateY(32px);
-  transition:
-    opacity 0.7s ease,
-    transform 0.7s ease;
-}
+/* 5.2 APARICIÓN AL HACER SCROLL (solo si el navegador ejecuta JS) */
+@media (scripting: enabled) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s ease;
+  }
 
-html.js .reveal.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
-html.js .reveal[data-delay="1"] {
-  transition-delay: 0.12s;
-}
+  .reveal[data-delay="1"] {
+    transition-delay: 0.12s;
+  }
 
-html.js .reveal[data-delay="2"] {
-  transition-delay: 0.24s;
-}
+  .reveal[data-delay="2"] {
+    transition-delay: 0.24s;
+  }
 
-html.js .reveal[data-delay="3"] {
-  transition-delay: 0.36s;
+  .reveal[data-delay="3"] {
+    transition-delay: 0.36s;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html.js .reveal {
+  .reveal {
     opacity: 1;
     transform: none;
     transition: none;
@@ -1016,31 +1018,68 @@ textarea {
 }
 
 /* ==========================================
-   SECCIÓN QUIÉNES SOMOS / VENDEDORES
+   SECCIÓN QUIÉNES SOMOS / EQUIPO DE TRABAJO
    Estilos integrados a la temática principal
    ========================================== */
 
-#seccion-quienes-somos {
-  padding: 3rem 1.5rem;
-}
-
 .team-hero {
-  margin-bottom: 3.5rem;
+  display: grid;
+  grid-template-columns: minmax(260px, 350px) 1fr;
+  gap: 2.5rem;
+  align-items: center;
+  max-width: 1020px;
+  margin: 0 auto 3.5rem;
 }
 
-.hero-img-placeholder {
-  width: 100%;
-  height: 320px;
-  background-color: var(--bg-card);
+.team-foto {
+  margin: 0;
   border: 1px solid var(--border-color);
   border-left: 4px solid var(--accent-red);
   border-radius: var(--radius);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+
+.team-foto img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+.team-presentacion {
+  max-width: 620px;
+}
+
+.team-presentacion p {
   color: var(--text-muted);
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.team-presentacion strong {
+  color: var(--text-primary);
+}
+
+.team-valores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.team-valores li {
+  padding: 0.45rem 0.9rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
 }
 
 .cta-container {
@@ -1059,9 +1098,15 @@ textarea {
   }
 }
 
-/* 2. TABLETS VERTICALES Y MÓVILES */
-@media (max-width: 768px) {
-  /* NAVBAR */
+/* NAVBAR: con los 4 enlaces ya no cabe en una fila por debajo de ~915px */
+@media (max-width: 1024px) {
+  .nav-links {
+    gap: 0.9rem;
+  }
+}
+
+/* Navbar en dos filas: logo y sesión arriba, enlaces centrados debajo */
+@media (max-width: 900px) {
   .navbar {
     flex-wrap: wrap;
     justify-content: center;
@@ -1102,7 +1147,10 @@ textarea {
     border-radius: 8px;
     font-size: 0.72rem;
   }
+}
 
+/* 2. TABLETS VERTICALES Y MÓVILES */
+@media (max-width: 768px) {
   /* LAYOUT Y TITULOS */
   .container {
     padding: 2rem 1rem;
@@ -1177,9 +1225,15 @@ textarea {
     height: 36px;
   }
 
-  /* EQUIPO DE TRABAJO */
-  .hero-img-placeholder {
-    height: 200px;
+  /* EQUIPO DE TRABAJO: una columna, foto centrada */
+  .team-hero {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .team-foto {
+    max-width: 320px;
+    margin: 0 auto;
   }
 
   .modelos-titulo {

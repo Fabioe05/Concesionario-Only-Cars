@@ -1,6 +1,7 @@
 // Secciones de vista
 const seccionLista = document.getElementById("seccion-lista");
 const seccionFormulario = document.getElementById("seccion-formulario");
+const seccionMarcas = document.getElementById("seccion-marcas");
 const cuerpoTablaVehiculos = document.getElementById("tabla-vehiculos-body");
 // Filtros de inventario
 const filtroMarca = document.getElementById("filtro-marca");
@@ -11,6 +12,15 @@ const btnCrearNuevo = document.getElementById("btn-crear-nuevo");
 const btnVolverLista = document.getElementById("btn-volver-lista");
 const tituloFormulario = document.getElementById("form-titulo");
 const btnVolverInicio = document.getElementById("btn-volver-inicio");
+// Gestión de marcas (vista aparte)
+const btnGestionarMarcas = document.getElementById("btn-gestionar-marcas");
+const btnVolverListaMarcas = document.getElementById("btn-volver-lista-marcas");
+const btnAgregarMarca = document.getElementById("btn-agregar-marca");
+const inputNuevaMarca = document.getElementById("nueva-marca");
+const cuerpoMarcasCon = document.getElementById("tabla-marcas-con-body");
+const cuerpoMarcasSin = document.getElementById("tabla-marcas-sin-body");
+const cuentaMarcasCon = document.getElementById("cuenta-con-marcas");
+const cuentaMarcasSin = document.getElementById("cuenta-sin-marcas");
 // Formulario y campos
 const formularioVehiculo = document.getElementById("form-vehiculo");
 const inputVehiculoId = document.getElementById("vehiculo-id");
@@ -78,17 +88,29 @@ function formatearTransmision(valor) {
     : "Manual";
 }
 
-// CAMBIO DE VISTAS (LISTA <-> FORMULARIO)
-function mostrarSeccionLista() {
-  if (seccionLista) seccionLista.style.display = "block";
-  if (seccionFormulario) seccionFormulario.style.display = "none";
+// CAMBIO DE VISTAS (LISTA <-> FORMULARIO <-> MARCAS)
+/**
+ * Muestra una vista del panel y oculta las demás.
+ */
+function mostrarSeccion(seccionActiva) {
+  [seccionLista, seccionFormulario, seccionMarcas].forEach((seccion) => {
+    if (seccion) {
+      seccion.style.display = seccion === seccionActiva ? "block" : "none";
+    }
+  });
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function mostrarSeccionLista() {
+  mostrarSeccion(seccionLista);
+}
+
 function mostrarSeccionFormulario() {
-  if (seccionLista) seccionLista.style.display = "none";
-  if (seccionFormulario) seccionFormulario.style.display = "block";
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  mostrarSeccion(seccionFormulario);
+}
+
+function mostrarSeccionMarcas() {
+  mostrarSeccion(seccionMarcas);
 }
 
 // CARGA, FILTRADO Y RENDERIZADO DEL INVENTARIO
@@ -98,7 +120,7 @@ async function cargarVehiculos() {
   try {
     cuerpoTablaVehiculos.innerHTML = `
       <tr>
-        <td colspan="10" class="text-center" style="padding: 30px; color: #888; text-align: center;">
+        <td colspan="10" class="tabla-mensaje">
           Cargando inventario de vehículos...
         </td>
       </tr>
@@ -115,7 +137,7 @@ async function cargarVehiculos() {
     console.error("Error al cargar vehículos:", error);
     cuerpoTablaVehiculos.innerHTML = `
       <tr>
-        <td colspan="10" style="padding: 30px; text-align: center; color: #f87171;">
+        <td colspan="10" class="tabla-mensaje tabla-mensaje--error">
           Error de conexión al cargar los vehículos. Por favor, recarga la página.
         </td>
       </tr>
@@ -219,28 +241,34 @@ function renderizarTablaVehiculos(vehiculos) {
   if (todosLosVehiculos.length === 0) {
     cuerpoTablaVehiculos.innerHTML = `
       <tr>
-        <td colspan="10" style="padding: 40px 20px; text-align: center; color: #aaa;">
-          <p style="font-size: 16px; margin-bottom: 12px;">No hay vehículos registrados en el catálogo actualmente.</p>
-          <button type="button" class="btn-nuevo-vehiculo" onclick="abrirFormularioCrear()" style="margin: 0 auto;">
+        <td colspan="10" class="tabla-mensaje tabla-mensaje--catalogo">
+          <p class="tabla-mensaje__titulo">No hay vehículos registrados en el catálogo actualmente.</p>
+          <button type="button" class="btn-nuevo-vehiculo">
             Crear el primer vehículo
           </button>
         </td>
       </tr>
     `;
+    cuerpoTablaVehiculos
+      .querySelector(".btn-nuevo-vehiculo")
+      .addEventListener("click", abrirFormularioCrear);
     return;
   }
 
   if (vehiculos.length === 0) {
     cuerpoTablaVehiculos.innerHTML = `
       <tr>
-        <td colspan="10" style="padding: 35px 20px; text-align: center; color: #8e8e93;">
-          <p style="font-size: 15px; margin-bottom: 8px;">No se encontraron vehículos que coincidan con los filtros seleccionados.</p>
-          <button type="button" class="btn-limpiar-filtros" onclick="resetearFiltros()" style="margin-top: 10px;">
+        <td colspan="10" class="tabla-mensaje tabla-mensaje--filtros">
+          <p class="tabla-mensaje__titulo">No se encontraron vehículos que coincidan con los filtros seleccionados.</p>
+          <button type="button" class="btn-limpiar-filtros">
             Limpiar filtros de búsqueda
           </button>
         </td>
       </tr>
     `;
+    cuerpoTablaVehiculos
+      .querySelector(".btn-limpiar-filtros")
+      .addEventListener("click", resetearFiltros);
     return;
   }
 
@@ -256,7 +284,7 @@ function renderizarTablaVehiculos(vehiculos) {
     const imagenes = vehiculo.images || [];
     const imagenHTML =
       imagenes.length > 0
-        ? `<img src="${imagenes[0]}" alt="${vehiculo.modelo}" class="vehiculo-img-thumb" onerror="this.outerHTML='<div class=\\'vehiculo-no-img\\'>Sin foto</div>'" />`
+        ? `<img src="${imagenes[0]}" alt="${vehiculo.modelo}" class="vehiculo-img-thumb" />`
         : `<div class="vehiculo-no-img">Sin foto</div>`;
 
     // Datos formateados y normalizados
@@ -274,7 +302,7 @@ function renderizarTablaVehiculos(vehiculos) {
       <td data-label="Año">${vehiculo.anio || "N/A"}</td>
       <td data-label="Kilometraje">${kmFormateado} km</td>
       <td data-label="Motor">${vehiculo.motor || "N/A"}</td>
-      <td data-label="Precio"><strong style="color: #ffffff;">$${precioFormateado}</strong></td>
+      <td data-label="Precio"><strong class="celda-precio">$${precioFormateado}</strong></td>
       <td data-label="Transmisión">${transmisionTexto}</td>
       <td data-label="Estatus"><span class="status-badge ${statusClass}">${rawStatus}</span></td>
       <td class="td-acciones">
@@ -291,6 +319,14 @@ function renderizarTablaVehiculos(vehiculos) {
         </div>
       </td>
     `;
+
+    // Si la foto de la miniatura no carga, se deja el recuadro "Sin foto"
+    const imgMiniatura = fila.querySelector(".vehiculo-img-thumb");
+    if (imgMiniatura) {
+      imgMiniatura.addEventListener("error", () => {
+        imgMiniatura.outerHTML = '<div class="vehiculo-no-img">Sin foto</div>';
+      });
+    }
 
     // Event listener para Ver
     const btnView = fila.querySelector(".btn-view");
@@ -347,6 +383,214 @@ async function cargarMarcas(marcaSeleccionada = "") {
   } catch (error) {
     console.error("Error al cargar marcas:", error);
     inputMarca.innerHTML = `<option value="">Seleccione una marca...</option>`;
+  }
+}
+
+// ==========================================
+// GESTIÓN DE MARCAS (CREAR / ELIMINAR)
+// ==========================================
+/**
+ * Refresca los tres sitios donde se usan las marcas:
+ * la tabla de gestión, el desplegable del formulario y el filtro del inventario.
+ */
+async function refrescarMarcas() {
+  await Promise.all([
+    cargarTablaMarcas(),
+    cargarMarcas(inputMarca ? inputMarca.value : ""),
+    poblarFiltroMarcas(todosLosVehiculos),
+  ]);
+}
+
+/**
+ * Pinta las dos listas de marcas: las que tienen vehículos y las que no.
+ */
+async function cargarTablaMarcas() {
+  // Los dos grupos de la vista, con lo que necesita cada uno.
+  const grupos = [
+    {
+      cuerpo: cuerpoMarcasCon,
+      cuenta: cuentaMarcasCon,
+      columnas: 3,
+      conConteo: true,
+      vacio: "Ninguna marca tiene vehículos todavía.",
+    },
+    {
+      cuerpo: cuerpoMarcasSin,
+      cuenta: cuentaMarcasSin,
+      columnas: 2,
+      conConteo: false,
+      vacio: "Todas las marcas tienen vehículos.",
+    },
+  ];
+
+  if (grupos.some((grupo) => !grupo.cuerpo)) return;
+
+  /** Deja un grupo con su lista (o con el aviso de que no hay marcas en él). */
+  const pintarGrupo = (grupo, lista) => {
+    if (lista.length === 0) {
+      grupo.cuerpo.innerHTML = `
+        <tr>
+          <td colspan="${grupo.columnas}" class="tabla-mensaje tabla-mensaje--vacio">
+            ${grupo.vacio}
+          </td>
+        </tr>
+      `;
+    } else {
+      grupo.cuerpo.innerHTML = "";
+      lista.forEach((marca) => {
+        grupo.cuerpo.appendChild(crearFilaMarca(marca, grupo.conConteo));
+      });
+    }
+
+    if (grupo.cuenta) grupo.cuenta.textContent = lista.length;
+  };
+
+  /** Pone el mismo mensaje en los dos grupos (cargando, error...). */
+  const mostrarMensaje = (texto, esError = false) => {
+    const clase = esError ? "tabla-mensaje tabla-mensaje--error" : "tabla-mensaje";
+    grupos.forEach((grupo) => {
+      grupo.cuerpo.innerHTML = `
+        <tr>
+          <td colspan="${grupo.columnas}" class="${clase}">
+            ${texto}
+          </td>
+        </tr>
+      `;
+    });
+  };
+
+  try {
+    mostrarMensaje("Cargando marcas...");
+
+    const res = await fetch("/api/marcas");
+    if (!res.ok) throw new Error("No se pudieron cargar las marcas");
+    const data = await res.json();
+
+    // Cuento los vehículos de cada marca; dentro de cada grupo va por nombre.
+    const marcas = (Array.isArray(data) ? data : [])
+      .map((marca) => ({
+        ...marca,
+        enUso: todosLosVehiculos.filter(
+          (vehiculo) => String(vehiculo.marca_id) === String(marca.id),
+        ).length,
+      }))
+      .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
+    if (marcas.length === 0) {
+      mostrarMensaje("No hay marcas registradas.");
+      if (cuentaMarcasCon) cuentaMarcasCon.textContent = "0";
+      if (cuentaMarcasSin) cuentaMarcasSin.textContent = "0";
+      return;
+    }
+
+    pintarGrupo(grupos[0], marcas.filter((marca) => marca.enUso > 0));
+    pintarGrupo(grupos[1], marcas.filter((marca) => marca.enUso === 0));
+  } catch (error) {
+    console.error("Error al cargar la tabla de marcas:", error);
+    mostrarMensaje("Error de conexión al cargar las marcas. Recarga la página.", true);
+  }
+}
+
+/**
+ * Crea la fila de una marca en la lista de gestión.
+ * `conConteo` añade la columna con los vehículos que la usan.
+ */
+function crearFilaMarca(marca, conConteo) {
+  const fila = document.createElement("tr");
+  fila.innerHTML = `
+    <td data-label="Marca"><strong>${marca.name}</strong></td>
+    ${conConteo ? `<td data-label="Vehículos">${marca.enUso}</td>` : ""}
+    <td class="td-acciones">
+      <div class="actions-cell">
+        <button type="button" class="btn-action btn-delete"
+          title="${marca.enUso > 0 ? "Tiene vehículos asociados" : "Eliminar esta marca"}">
+          Eliminar
+        </button>
+      </div>
+    </td>
+  `;
+
+  fila
+    .querySelector(".btn-delete")
+    .addEventListener("click", () => eliminarMarca(marca, marca.enUso));
+
+  return fila;
+}
+
+/**
+ * Crea una marca con el nombre escrito en el campo.
+ */
+async function agregarMarca() {
+  const nombre = (inputNuevaMarca ? inputNuevaMarca.value : "").trim();
+
+  if (!nombre) {
+    alert("Escribe el nombre de la marca.");
+    if (inputNuevaMarca) inputNuevaMarca.focus();
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/marcas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: nombre }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      alert(
+        data.error ||
+          data.mensaje ||
+          `No se pudo crear la marca (${res.status}).`,
+      );
+      return;
+    }
+
+    if (inputNuevaMarca) inputNuevaMarca.value = "";
+    await refrescarMarcas();
+  } catch (error) {
+    console.error("Error al crear la marca:", error);
+    alert("Hubo un error de conexión al crear la marca.");
+  }
+}
+
+/**
+ * Elimina una marca, avisando antes si tiene vehículos asociados.
+ */
+async function eliminarMarca(marca, vehiculosEnUso) {
+  if (vehiculosEnUso > 0) {
+    alert(
+      `No se puede eliminar "${marca.name}": ${vehiculosEnUso} vehículo(s) la usan.`,
+    );
+    return;
+  }
+
+  if (
+    !confirm(
+      `¿Eliminar la marca "${marca.name}"? Esta acción no se puede deshacer.`,
+    )
+  ) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/marcas/${marca.id}`, { method: "DELETE" });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      alert(
+        data.error ||
+          data.mensaje ||
+          `No se pudo eliminar la marca (${res.status}).`,
+      );
+      return;
+    }
+
+    await refrescarMarcas();
+  } catch (error) {
+    console.error("Error al eliminar la marca:", error);
+    alert("Hubo un error de conexión al eliminar la marca.");
   }
 }
 
@@ -556,7 +800,7 @@ function abrirModalDetalle(vehiculo) {
           ${imagenes
             .map(
               (img, idx) => `
-            <img src="${img}" alt="Foto ${idx + 1}" class="detalle-thumb ${idx === 0 ? "active" : ""}" onclick="window.cambiarImagenPrincipalDetalle('${img}', this)" />
+            <img src="${img}" alt="Foto ${idx + 1}" class="detalle-thumb ${idx === 0 ? "active" : ""}" />
           `,
             )
             .join("")}
@@ -566,7 +810,7 @@ function abrirModalDetalle(vehiculo) {
     imagenesHTML = `
       <div class="detalle-galeria">
         <div class="detalle-imagen-principal-wrapper">
-          <img id="detalle-img-principal" src="${principalImg}" alt="${nombreVehiculo}" class="detalle-imagen-principal" onerror="this.outerHTML='<div class=\\'detalle-no-img\\'>Imagen no disponible</div>'" />
+          <img id="detalle-img-principal" src="${principalImg}" alt="${nombreVehiculo}" class="detalle-imagen-principal" />
         </div>
         ${miniaturasHTML}
       </div>
@@ -629,6 +873,29 @@ function abrirModalDetalle(vehiculo) {
         </div>
       </div>
     `;
+
+    // Clic en una miniatura para cambiar la foto principal
+    modalDetalleContenido
+      .querySelectorAll(".detalle-thumb")
+      .forEach((miniatura) => {
+        miniatura.addEventListener("click", () => {
+          cambiarImagenPrincipalDetalle(
+            miniatura.getAttribute("src"),
+            miniatura,
+          );
+        });
+      });
+
+    // Si la foto principal no carga, se avisa en su hueco
+    const imgPrincipalDetalle = modalDetalleContenido.querySelector(
+      "#detalle-img-principal",
+    );
+    if (imgPrincipalDetalle) {
+      imgPrincipalDetalle.addEventListener("error", () => {
+        imgPrincipalDetalle.outerHTML =
+          '<div class="detalle-no-img">Imagen no disponible</div>';
+      });
+    }
   }
 
   if (modalDetalleVehiculo) {
@@ -648,7 +915,6 @@ function cambiarImagenPrincipalDetalle(url, thumbElem) {
     thumbElem.classList.add("active");
   }
 }
-window.cambiarImagenPrincipalDetalle = cambiarImagenPrincipalDetalle;
 
 function cerrarModalDetalle() {
   if (modalDetalleVehiculo) {
@@ -848,6 +1114,36 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnCrearNuevo) {
     btnCrearNuevo.addEventListener("click", () => {
       abrirFormularioCrear();
+    });
+  }
+
+  // Gestión de marcas
+  if (btnGestionarMarcas) {
+    btnGestionarMarcas.addEventListener("click", () => {
+      cargarTablaMarcas();
+      mostrarSeccionMarcas();
+    });
+  }
+
+  if (btnVolverListaMarcas) {
+    btnVolverListaMarcas.addEventListener("click", () => {
+      mostrarSeccionLista();
+    });
+  }
+
+  if (btnAgregarMarca) {
+    btnAgregarMarca.addEventListener("click", () => {
+      agregarMarca();
+    });
+  }
+
+  // Permitir crear con Enter (el campo no está dentro de un <form>)
+  if (inputNuevaMarca) {
+    inputNuevaMarca.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        agregarMarca();
+      }
     });
   }
 

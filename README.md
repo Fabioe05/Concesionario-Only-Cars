@@ -87,6 +87,13 @@ Los vehículos se exponen con un CRUD completo. **Todas las escrituras** pasan p
 
 El listado permite **filtros por query** (`?marca=...`, `?status=...`), así que el catálogo y el panel reutilizan el mismo endpoint.
 
+### Gestión de marcas
+
+`GET /api/marcas` es público: alimenta los filtros del catálogo y el formulario del panel. El **alta y la baja son solo para el admin** y llevan reglas de negocio:
+
+- **Alta** (`POST /api/marcas`): el nombre es obligatorio (400) y se compara **sin distinguir mayúsculas** con las que ya existen, así que `"kia"` choca con `"Kia"` (409). El texto se escapa antes de buscar, para tratarlo como literal y no como patrón.
+- **Baja** (`DELETE /api/marcas/:id`): se valida el ID (400) y que la marca exista (404); se **bloquea** si algún vehículo la usa (409), porque los vehículos guardan `marca_id` y quedarían huérfanos.
+
 ### Imágenes: de la subida a la pantalla
 
 Las fotos subidas desde el panel **se guardan como binario en MongoDB**:
@@ -118,7 +125,7 @@ Todo el borrado pasa por `utils/imagenes.js`, que distingue entre rutas locales 
 
 ### Frontend
 
-Cada página es un HTML con su propio script; `sesion.js` es el único **compartido** en todas ellas y se encarga del navbar: mostrar u ocultar login/registro, pintar el perfil desplegable y cerrar sesión. Toda la comunicación con el backend es con `fetch` a rutas de la **misma aplicación**, por lo que no hay problemas de CORS ni URLs absolutas entre dominios.
+Cada página es un HTML con su propio script; `sesion.js` es el único **compartido**: lo cargan todas las páginas públicas y se encarga del navbar (mostrar u ocultar login/registro, pintar el perfil desplegable y cerrar sesión). El panel de administración no lo usa, tiene su propio `admin/admin.js`. Toda la comunicación con el backend es con `fetch` a rutas de la **misma aplicación**, por lo que no hay problemas de CORS ni URLs absolutas entre dominios.
 
 ---
 
@@ -132,7 +139,7 @@ concesionario/
 ├── controllers/               # Rutas de la API
 │   ├── auth.js                #   Registro, login, logout, perfil
 │   ├── vehiculos.js           #   CRUD de vehículos
-│   ├── marcas.js              #   Listado de marcas
+│   ├── marcas.js              #   Listado público · alta y baja (solo admin)
 │   └── imagenes.js            #   Sirve las imágenes guardadas en la base de datos
 │
 ├── models/                    # Esquemas de Mongoose
@@ -152,7 +159,7 @@ concesionario/
 ├── scripts/
 │   └── limpiar-huerfanos.js   #   Elimina archivos huérfanos en public/uploads
 │
-├── admin/                     # Panel de administración (admin.html · admin.css · admin.js)
+├── admin/                     # Panel (admin.html · admin.css · admin.js): vehículos, formulario y marcas
 │
 ├── contenedorPrincipal/       # Zona de usuario
 │   ├── auth.css               #   Estilos de login/registro
@@ -195,6 +202,8 @@ Las rutas **Admin** requieren sesión con rol de administrador (cookie `accessTo
 | Método | Ruta | Acceso | Descripción |
 |---|---|---|---|
 | `GET` | `/api/marcas` | Público | Lista todas las marcas. |
+| `POST` | `/api/marcas` | **Admin** | Crea una marca (400 si el nombre está vacío, 409 si ya existe). |
+| `DELETE` | `/api/marcas/:id` | **Admin** | Elimina una marca (409 si algún vehículo la usa). |
 | `GET` | `/api/imagenes/:id` | Público | Devuelve el binario de una imagen. |
 
 ---
@@ -216,7 +225,7 @@ Las rutas **Admin** requieren sesión con rol de administrador (cookie `accessTo
 |---|---|
 | Invitado | Catálogo, fichas, marcas y registro. |
 | `cliente` | Lo anterior + sesión y perfil. |
-| `admin` | Todo + panel y CRUD de vehículos. |
+| `admin` | Todo + panel, CRUD de vehículos y gestión de marcas. |
 
 ---
 

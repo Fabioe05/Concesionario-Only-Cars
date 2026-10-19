@@ -30,7 +30,7 @@ function crearTarjetaOferta(vehiculo, indice) {
 
   const imagenHTML =
     imagenes.length > 0
-      ? `<img src="${imagenes[0]}" alt="${nombre || "Vehículo"}" loading="lazy" onerror="this.parentElement.textContent = 'Sin imagen';" />`
+      ? `<img src="${imagenes[0]}" alt="${nombre || "Vehículo"}" loading="lazy" />`
       : "Sin imagen";
 
   const precioFormateado = Number(vehiculo.precio || 0).toLocaleString("en-US");
@@ -64,6 +64,14 @@ function renderizarMejoresOfertas(vehiculos) {
   }
 
   mejoresOfertas.innerHTML = ofertas.map(crearTarjetaOferta).join("");
+
+  // Si la foto de una tarjeta no carga, se deja "Sin imagen" en su hueco
+  mejoresOfertas.querySelectorAll("img").forEach((img) => {
+    img.addEventListener("error", () => {
+      img.parentElement.textContent = "Sin imagen";
+    });
+  });
+
   activarAnimaciones();
 }
 

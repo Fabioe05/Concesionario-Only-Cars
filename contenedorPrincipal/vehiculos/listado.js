@@ -32,7 +32,7 @@ function crearTarjetaVehiculo(vehiculo) {
   const imagenes = vehiculo.images || [];
   const imagenHTML =
     imagenes.length > 0
-      ? `<img src="${imagenes[0]}" alt="${vehiculo.modelo || "Vehículo"}" onerror="this.parentElement.textContent = 'Sin imagen';" />`
+      ? `<img src="${imagenes[0]}" alt="${vehiculo.modelo || "Vehículo"}" />`
       : "Sin imagen";
 
   const precioFormateado = aNumero(vehiculo.precio).toLocaleString("en-US");
@@ -86,6 +86,13 @@ function renderizarVehiculos() {
   vehiculosGrid.innerHTML = ordenarVehiculos(vehiculosFiltrados)
     .map(crearTarjetaVehiculo)
     .join("");
+
+  // Si la foto de una tarjeta no carga, se deja "Sin imagen" en su hueco
+  vehiculosGrid.querySelectorAll("img").forEach((img) => {
+    img.addEventListener("error", () => {
+      img.parentElement.textContent = "Sin imagen";
+    });
+  });
 }
 
 /**

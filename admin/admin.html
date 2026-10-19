@@ -21,6 +21,9 @@
                 <button type="button" id="btn-volver-inicio" class="btn-volver-inicio">
                     Volver al Inicio
                 </button>
+                <button type="button" id="btn-gestionar-marcas" class="btn-volver-inicio">
+                    Gestionar Marcas
+                </button>
                 <button type="button" id="btn-crear-nuevo" class="btn-nuevo-vehiculo">
                     Crear Nuevo Vehículo
                 </button>
@@ -59,12 +62,12 @@
                             <th>Precio</th>
                             <th>Transmisión</th>
                             <th>Estatus</th>
-                            <th style="text-align: center; min-width: 170px;">Acciones</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tabla-vehiculos-body">
                         <tr>
-                            <td colspan="10" class="text-center" style="padding: 30px; color: #888;">
+                            <td colspan="10" class="tabla-mensaje">
                                 Cargando inventario de vehículos...
                             </td>
                         </tr>
@@ -74,7 +77,7 @@
         </section>
 
         <!-- VISTA 2: FORMULARIO DE CREAR / EDITAR VEHÍCULO -->
-        <section id="seccion-formulario" style="display: none;">
+        <section id="seccion-formulario">
             <div class="form-header-bar">
                 <button type="button" id="btn-volver-lista" class="btn-volver">
                     ← Volver al Listado
@@ -175,8 +178,85 @@
             </div>
         </section>
 
+        <!-- VISTA 3: GESTIÓN DE MARCAS -->
+        <section id="seccion-marcas">
+            <div class="form-header-bar">
+                <button type="button" id="btn-volver-lista-marcas" class="btn-volver">
+                    ← Volver al Listado
+                </button>
+                <h2 class="form-titulo">Gestión de Marcas</h2>
+            </div>
+
+            <div class="admin-layout">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="nueva-marca">Nueva Marca *</label>
+                        <input type="text" id="nueva-marca" placeholder="Ej: Suzuki" autocomplete="off">
+                    </div>
+                </div>
+                <div class="actions-section">
+                    <button type="button" id="btn-agregar-marca" class="btn-admin btn-primary">
+                        Agregar Marca
+                    </button>
+                </div>
+            </div>
+
+            <div class="marcas-columnas">
+                <!-- Grupo 1: marcas que sí tienen vehículos -->
+                <div class="marcas-grupo">
+                    <h3 class="marcas-rotulo">
+                        Con vehículos
+                        <span id="cuenta-con-marcas" class="marcas-cuenta"></span>
+                    </h3>
+                    <div class="table-responsive">
+                        <table class="vehiculos-table tabla-marcas-con">
+                            <thead>
+                                <tr>
+                                    <th>Marca</th>
+                                    <th>Vehículos</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-marcas-con-body">
+                                <tr>
+                                    <td colspan="3" class="tabla-mensaje">
+                                        Cargando marcas...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Grupo 2: marcas sin vehículos -->
+                <div class="marcas-grupo">
+                    <h3 class="marcas-rotulo marcas-rotulo--tenue">
+                        Sin vehículos
+                        <span id="cuenta-sin-marcas" class="marcas-cuenta"></span>
+                    </h3>
+                    <div class="table-responsive">
+                        <table class="vehiculos-table tabla-marcas-sin">
+                            <thead>
+                                <tr>
+                                    <th>Marca</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-marcas-sin-body">
+                                <tr>
+                                    <td colspan="2" class="tabla-mensaje">
+                                        Cargando marcas...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- MODAL: DETALLES DE VEHÍCULO -->
-        <div id="modal-detalle-vehiculo" class="modal-overlay" style="display: none;">
+        <div id="modal-detalle-vehiculo" class="modal-overlay">
             <div class="modal-container">
                 <div class="modal-header">
                     <div>
