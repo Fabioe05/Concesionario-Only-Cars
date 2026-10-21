@@ -162,7 +162,11 @@
                                         Limpiar imágenes
                                     </button>
                                 </div>
-                                <input type="file" id="images" name="images" multiple accept="image/*">
+                                <div class="upload-control">
+                                    <input type="file" id="images" name="images" multiple accept="image/*" class="upload-input">
+                                    <label for="images" class="upload-btn">Elegir imágenes</label>
+                                    <span class="upload-info" id="upload-info">Hasta 10 imágenes · 5 MB cada una</span>
+                                </div>
                                 <!-- Contenedor para previsualización dinámica de imágenes -->
                                 <div id="vista-previa" class="vista-previa-imagenes"></div>
                             </div>

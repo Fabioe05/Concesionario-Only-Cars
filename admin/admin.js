@@ -50,6 +50,7 @@ const btnModalCerrar = document.getElementById("btn-modal-cerrar");
 // Manejo de imágenes
 const inputImagenes = document.getElementById("images");
 const btnLimpiarImagenes = document.getElementById("btn-limpiar-imagenes");
+const infoImagenes = document.getElementById("upload-info");
 const divVistaPrevia = document.getElementById("vista-previa");
 // Botones de acción del formulario
 const btnGuardar = document.getElementById("btn-guardar");
@@ -657,6 +658,15 @@ function actualizarVistaPrevia() {
     card.appendChild(btnQuitar);
     divVistaPrevia.appendChild(card);
   });
+
+  // 3. Contador de imágenes (existentes + nuevas)
+  const total = imagenesExistentes.length + archivosNuevos.length;
+  if (infoImagenes) {
+    infoImagenes.textContent =
+      total === 0
+        ? "Hasta 10 imágenes · 5 MB cada una"
+        : `${total} de ${MAX_IMAGENES} imágenes seleccionadas`;
+  }
 }
 
 function sincronizarArchivos() {
@@ -678,7 +688,7 @@ function limpiarImagenes() {
   if (inputImagenes) {
     inputImagenes.value = "";
   }
-  divVistaPrevia.innerHTML = "";
+  actualizarVistaPrevia();
 }
 
 // ==========================================
