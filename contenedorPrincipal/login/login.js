@@ -5,6 +5,12 @@ const formularioLogin = document.querySelector("form");
 const inputCorreo = document.querySelector('input[type="email"]');
 const inputClave = document.querySelector('input[type="password"]');
 
+// Guarda a dónde quería ir el usuario antes de que el muro lo mandara aquí.
+const destinoGuardado = new URLSearchParams(window.location.search).get("redirect");
+if (destinoGuardado) {
+  sessionStorage.setItem("redirectPendiente", destinoGuardado);
+}
+
 // ==========================================
 // 2. FUNCIONES PRINCIPALES
 // ==========================================
@@ -29,7 +35,12 @@ async function manejarLogin(event) {
       localStorage.setItem("rolUsuario", datos.role);
 
       alert(`¡Bienvenido de nuevo, ${datos.name}!`);
-      window.location.href = "/";
+
+      // Vuelve a la página que el usuario intentaba abrir (si es interna).
+      const destino = sessionStorage.getItem("redirectPendiente") || "/";
+      sessionStorage.removeItem("redirectPendiente");
+      const esRutaInterna = destino.startsWith("/") && !destino.startsWith("//");
+      window.location.href = esRutaInterna ? destino : "/";
     } else {
       alert(datos.error || "Credenciales incorrectas");
     }

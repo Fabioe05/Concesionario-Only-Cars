@@ -9,6 +9,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const { userExtractor, requiereSesionPagina } = require("./middlewares/auth");
 
 const vehiculosRouter = require("./controllers/vehiculos");
 const marcasRouter = require("./controllers/marcas");
@@ -31,15 +32,57 @@ const RAIZ = __dirname;
 app.use("/img", express.static(path.join(RAIZ, "public", "img")));
 app.use("/uploads", express.static(path.join(RAIZ, "public", "uploads")));
 
-// Vistas del sitio y del panel de administración.
-app.use("/contenedorPrincipal", express.static(path.join(RAIZ, "contenedorPrincipal")));
+// Vistas del sitio: solo el login, el registro y su CSS son públicos.
+const PAGINAS_PUBLICAS = ["/login/", "/registro/", "/auth.css"];
+
+app.use("/contenedorPrincipal", (req, res, next) => {
+  if (PAGINAS_PUBLICAS.some((ruta) => req.path.startsWith(ruta))) {
+    return next();
+  }
+  return requiereSesionPagina(req, res, next);
+});
+
+app.use(
+  "/contenedorPrincipal",
+  express.static(path.join(RAIZ, "contenedorPrincipal"), {
+    setHeaders: (res) => res.setHeader("Cache-Control", "no-store"),
+  }),
+);
+
+// Panel de administración: se queda como estaba (la API ya exige rol admin).
 app.use("/admin", express.static(path.join(RAIZ, "admin")));
 
-// Archivos sueltos de la portada (solo estos; el resto de la raíz queda bloqueado).
-const ARCHIVOS_PUBLICOS = ["index.html", "index.css", "index.js", "sesion.js"];
-app.get("/", (req, res) => res.sendFile(path.join(RAIZ, "index.html")));
-ARCHIVOS_PUBLICOS.forEach((archivo) => {
-  app.get(`/${archivo}`, (req, res) => res.sendFile(path.join(RAIZ, archivo)));
+// Portada: sin sesión se muestra la bienvenida pública; con sesión, la home.
+app.get(
+  ["/", "/index.html"],
+  (req, res, next) => {
+    if (!req.cookies?.accessToken) {
+      return res.redirect("/bienvenida.html");
+    }
+    return requiereSesionPagina(req, res, next);
+  },
+  (req, res) => {
+    res.sendFile(path.join(RAIZ, "index.html"), {
+      headers: { "Cache-Control": "no-store" },
+    });
+  },
+);
+
+// Archivos sueltos públicos (los usa la bienvenida y el login).
+["index.css", "index.js", "sesion.js", "bienvenida.html", "bienvenida.css"].forEach(
+  (archivo) => {
+    app.get(`/${archivo}`, (req, res) => res.sendFile(path.join(RAIZ, archivo)));
+  },
+);
+
+// Toda la API exige sesión, salvo entrar, registrarse y cerrar sesión.
+const RUTAS_API_PUBLICAS = ["/auth/login", "/auth/register", "/auth/logout"];
+
+app.use("/api", (req, res, next) => {
+  if (RUTAS_API_PUBLICAS.some((ruta) => req.path.startsWith(ruta))) {
+    return next();
+  }
+  return userExtractor(req, res, next);
 });
 
 // --- Rutas de la API ---
