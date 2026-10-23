@@ -1478,17 +1478,9 @@ async function guardarCita(estadoForzado = null) {
       return;
     }
 
-    let mensaje = "Cita actualizada correctamente.";
-    if (data?.correo?.cliente === true) {
-      mensaje = "Cita actualizada y correo enviado al cliente.";
-    } else if (data?.correo?.cliente === false) {
-      mensaje =
-        "Cita actualizada, pero no se pudo enviar el correo al cliente. Revisa la configuración SMTP.";
-    }
-
     cerrarModalCita();
     await cargarCitas();
-    alert(mensaje);
+    alert("Cita actualizada correctamente.");
   } catch (error) {
     console.error("Error al actualizar la cita:", error);
     mostrarMensajeCita("No se pudo conectar con el servidor.");

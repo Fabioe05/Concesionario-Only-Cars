@@ -578,13 +578,9 @@ async function manejarEnvioCita(evento) {
       return;
     }
 
-    const avisoCorreo =
-      resultado.correo?.cliente === false
-        ? " No pudimos enviarte el correo de confirmación, pero la cita quedó registrada."
-        : "";
-
     mostrarEstadoCita(
-      `${resultado.mensaje || "Solicitud enviada. Te contactaremos para confirmar."}${avisoCorreo}`,
+      resultado.mensaje ||
+        "Solicitud enviada. Te contactaremos para confirmar.",
       "exito",
     );
 
