@@ -5,6 +5,7 @@ const btnLogin = document.getElementById("btn-login");
 const btnRegistro = document.getElementById("btn-registro");
 const btnCerrarSesion = document.getElementById("btn-cerrar-sesion");
 const btnAdmin = document.getElementById("btn-admin"); // Botón hacia el panel de administración
+const btnMisCitas = document.getElementById("btn-mis-citas"); // Enlace a las citas del cliente
 
 // Perfil: avatar con iniciales + panel desplegable
 const perfil = document.getElementById("perfil");
@@ -110,6 +111,7 @@ function actualizarInterfazSesion() {
     if (btnLogin) btnLogin.style.display = "none";
     if (btnRegistro) btnRegistro.style.display = "none";
     if (btnAdmin) btnAdmin.style.display = rol === "admin" ? "block" : "none";
+    if (btnMisCitas) btnMisCitas.style.display = "block";
 
     // Pintamos de una lo que ya sabemos (nombre y rol) para que se vea instantáneo
     const iniciales = obtenerIniciales(usuario);
@@ -126,8 +128,29 @@ function actualizarInterfazSesion() {
     if (btnLogin) btnLogin.style.display = "inline-block";
     if (btnRegistro) btnRegistro.style.display = "inline-block";
     if (btnAdmin) btnAdmin.style.display = "none"; // Oculta el botón Admin por seguridad visual
+    if (btnMisCitas) btnMisCitas.style.display = "none";
     if (perfil) perfil.style.display = "none";
     alternarPerfil(false);
+  }
+}
+
+/**
+ * Si falta el marcador local pero la cookie de sesión sigue viva,
+ * recupera el usuario y vuelve a pintar la interfaz.
+ */
+async function verificarSesionSinMarcador() {
+  if (localStorage.getItem("usuarioActivo")) return;
+
+  try {
+    const respuesta = await fetch("/api/auth/me");
+    if (!respuesta.ok) return;
+
+    const datos = await respuesta.json();
+    localStorage.setItem("usuarioActivo", datos.name || "Usuario");
+    localStorage.setItem("rolUsuario", datos.role || "cliente");
+    actualizarInterfazSesion();
+  } catch (error) {
+    // Sin sesión o sin conexión: la interfaz se queda como invitado.
   }
 }
 
@@ -152,6 +175,7 @@ async function manejarCierreSesion() {
 document.addEventListener("DOMContentLoaded", () => {
   // 1. Ejecutar verificación al cargar la página
   actualizarInterfazSesion();
+  verificarSesionSinMarcador();
 
   // 2. Abrir/cerrar el panel desde el avatar
   if (btnPerfil) {

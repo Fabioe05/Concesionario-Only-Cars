@@ -2,6 +2,7 @@
 const seccionLista = document.getElementById("seccion-lista");
 const seccionFormulario = document.getElementById("seccion-formulario");
 const seccionMarcas = document.getElementById("seccion-marcas");
+const seccionCitas = document.getElementById("seccion-citas");
 const cuerpoTablaVehiculos = document.getElementById("tabla-vehiculos-body");
 // Filtros de inventario
 const filtroMarca = document.getElementById("filtro-marca");
@@ -21,6 +22,14 @@ const cuerpoMarcasCon = document.getElementById("tabla-marcas-con-body");
 const cuerpoMarcasSin = document.getElementById("tabla-marcas-sin-body");
 const cuentaMarcasCon = document.getElementById("cuenta-con-marcas");
 const cuentaMarcasSin = document.getElementById("cuenta-sin-marcas");
+// Gestión de citas (vista aparte)
+const btnGestionarCitas = document.getElementById("btn-gestionar-citas");
+const btnVolverListaCitas = document.getElementById("btn-volver-lista-citas");
+const cuerpoTablaCitas = document.getElementById("tabla-citas-body");
+const filtroCitaEstado = document.getElementById("filtro-cita-estado");
+const filtroCitaFecha = document.getElementById("filtro-cita-fecha");
+const btnActualizarCitas = document.getElementById("btn-actualizar-citas");
+const btnLimpiarFiltrosCitas = document.getElementById("btn-limpiar-filtros-citas");
 // Formulario y campos
 const formularioVehiculo = document.getElementById("form-vehiculo");
 const inputVehiculoId = document.getElementById("vehiculo-id");
@@ -55,6 +64,27 @@ const divVistaPrevia = document.getElementById("vista-previa");
 // Botones de acción del formulario
 const btnGuardar = document.getElementById("btn-guardar");
 const btnCancelar = document.getElementById("btn-cancelar");
+// Modal de gestión de citas
+const modalCita = document.getElementById("modal-cita");
+const modalCitaTitulo = document.getElementById("modal-cita-titulo");
+const modalCitaSubtitulo = document.getElementById("modal-cita-subtitulo");
+const btnCerrarModalCita = document.getElementById("btn-cerrar-modal-cita");
+const btnCerrarModalCitaPie = document.getElementById("btn-cerrar-modal-cita-pie");
+const citaDetalleNombre = document.getElementById("cita-detalle-nombre");
+const citaDetalleEmail = document.getElementById("cita-detalle-email");
+const citaDetalleTelefono = document.getElementById("cita-detalle-telefono");
+const citaDetalleVehiculo = document.getElementById("cita-detalle-vehiculo");
+const citaDetalleFecha = document.getElementById("cita-detalle-fecha");
+const citaDetalleEstado = document.getElementById("cita-detalle-estado");
+const citaDetalleMensaje = document.getElementById("cita-detalle-mensaje");
+const citaGestionEstado = document.getElementById("cita-gestion-estado");
+const citaGestionFecha = document.getElementById("cita-gestion-fecha");
+const citaGestionHora = document.getElementById("cita-gestion-hora");
+const citaGestionNotas = document.getElementById("cita-gestion-notas");
+const citaGestionMensaje = document.getElementById("cita-gestion-mensaje");
+const btnCitaConfirmar = document.getElementById("btn-cita-confirmar");
+const btnCitaCancelar = document.getElementById("btn-cita-cancelar");
+const btnCitaGuardar = document.getElementById("btn-cita-guardar");
 
 let todosLosVehiculos = [];
 let vehiculoActualDetalle = null;
@@ -62,6 +92,24 @@ let archivosNuevos = [];
 let imagenesExistentes = [];
 let modoFormulario = "POST";
 const MAX_IMAGENES = 10;
+const HORAS_CITA = [
+  "09:00",
+  "10:00",
+  "11:00",
+  "12:00",
+  "13:00",
+  "14:00",
+  "15:00",
+  "16:00",
+];
+const ESTADOS_CITA = {
+  pendiente: { texto: "Pendiente", clase: "pendiente" },
+  confirmada: { texto: "Confirmada", clase: "confirmada" },
+  cancelada: { texto: "Cancelada", clase: "cancelada" },
+  completada: { texto: "Completada", clase: "completada" },
+};
+let todasLasCitas = [];
+let citaActual = null;
 
 // UTILIDADES (formato y normalización de datos)
 /** Precio con separador de miles. */
@@ -89,16 +137,63 @@ function formatearTransmision(valor) {
     : "Manual";
 }
 
-// CAMBIO DE VISTAS (LISTA <-> FORMULARIO <-> MARCAS)
+/** Escapa texto que viene de la base antes de insertarlo con innerHTML. */
+function escaparHtml(valor) {
+  return String(valor ?? "").replace(/[&<>"']/g, (caracter) => {
+    const mapa = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    return mapa[caracter];
+  });
+}
+
+/** Convierte YYYY-MM-DD en DD/MM/YYYY sin tocar la zona horaria. */
+function formatearFechaCita(fecha) {
+  const partes = String(fecha || "").split("-");
+  if (partes.length !== 3) return fecha || "N/A";
+  return `${partes[2]}/${partes[1]}/${partes[0]}`;
+}
+
+function infoEstadoCita(estado) {
+  return (
+    ESTADOS_CITA[estado] || {
+      texto: estado || "Sin estado",
+      clase: "pendiente",
+    }
+  );
+}
+
+function hoyEnCaracasAdmin() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Caracas",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+function sumarDiasAdmin(fecha, dias) {
+  const fechaBase = new Date(`${fecha}T12:00:00Z`);
+  fechaBase.setUTCDate(fechaBase.getUTCDate() + dias);
+  return fechaBase.toISOString().slice(0, 10);
+}
+
+// CAMBIO DE VISTAS (LISTA <-> FORMULARIO <-> MARCAS <-> CITAS)
 /**
  * Muestra una vista del panel y oculta las demás.
  */
 function mostrarSeccion(seccionActiva) {
-  [seccionLista, seccionFormulario, seccionMarcas].forEach((seccion) => {
-    if (seccion) {
-      seccion.style.display = seccion === seccionActiva ? "block" : "none";
-    }
-  });
+  [seccionLista, seccionFormulario, seccionMarcas, seccionCitas].forEach(
+    (seccion) => {
+      if (seccion) {
+        seccion.style.display = seccion === seccionActiva ? "block" : "none";
+      }
+    },
+  );
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -112,6 +207,10 @@ function mostrarSeccionFormulario() {
 
 function mostrarSeccionMarcas() {
   mostrarSeccion(seccionMarcas);
+}
+
+function mostrarSeccionCitas() {
+  mostrarSeccion(seccionCitas);
 }
 
 // CARGA, FILTRADO Y RENDERIZADO DEL INVENTARIO
@@ -1094,7 +1193,320 @@ function limpiarFormulario() {
 }
 
 // ==========================================
-// 12. INICIALIZACIÓN Y EVENT LISTENERS
+// 12. GESTIÓN DE CITAS
+// ==========================================
+async function cargarCitas() {
+  if (!cuerpoTablaCitas) return;
+
+  cuerpoTablaCitas.innerHTML = `
+    <tr>
+      <td colspan="7" class="tabla-mensaje">Cargando citas...</td>
+    </tr>
+  `;
+
+  try {
+    const parametros = new URLSearchParams();
+    if (filtroCitaEstado?.value) {
+      parametros.set("estado", filtroCitaEstado.value);
+    }
+    if (filtroCitaFecha?.value) {
+      parametros.set("fecha", filtroCitaFecha.value);
+    }
+
+    const consulta = parametros.toString();
+    const res = await fetch(`/api/citas${consulta ? `?${consulta}` : ""}`);
+
+    if (res.status === 401 || res.status === 403) {
+      cuerpoTablaCitas.innerHTML = `
+        <tr>
+          <td colspan="7" class="tabla-mensaje tabla-mensaje--error">
+            <p class="tabla-mensaje__titulo">Necesitas una sesión de administrador.</p>
+            <a class="btn-limpiar-filtros" href="/contenedorPrincipal/login/login.html?redirect=/admin/admin.html">
+              Iniciar sesión
+            </a>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    if (!res.ok) throw new Error("No se pudieron cargar las citas");
+
+    const data = await res.json();
+    todasLasCitas = Array.isArray(data) ? data : [];
+    renderizarTablaCitas(todasLasCitas);
+  } catch (error) {
+    console.error("Error al cargar citas:", error);
+    cuerpoTablaCitas.innerHTML = `
+      <tr>
+        <td colspan="7" class="tabla-mensaje tabla-mensaje--error">
+          Error de conexión al cargar las citas. Recarga la página.
+        </td>
+      </tr>
+    `;
+  }
+}
+
+function renderizarTablaCitas(citas) {
+  if (!cuerpoTablaCitas) return;
+
+  if (!citas.length) {
+    const hayFiltros = Boolean(
+      filtroCitaEstado?.value || filtroCitaFecha?.value,
+    );
+    cuerpoTablaCitas.innerHTML = `
+      <tr>
+        <td colspan="7" class="tabla-mensaje">
+          ${
+            hayFiltros
+              ? "No hay citas que coincidan con los filtros."
+              : "Todavía no hay citas registradas."
+          }
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  cuerpoTablaCitas.innerHTML = "";
+
+  citas.forEach((cita) => {
+    const estado = infoEstadoCita(cita.estado);
+    const fecha = formatearFechaCita(cita.fecha);
+    const mensaje = String(cita.mensaje || "").trim();
+    const mensajeCorto =
+      mensaje.length > 80 ? `${mensaje.slice(0, 80)}…` : mensaje;
+    const email = String(cita.email || "").trim();
+    const telefono = String(cita.telefono || "").trim();
+    const emailHref = email ? `mailto:${encodeURI(email)}` : "";
+    const telefonoHref = telefono
+      ? `tel:${encodeURI(telefono.replace(/[^\d+]/g, ""))}`
+      : "";
+
+    const fila = document.createElement("tr");
+    fila.innerHTML = `
+      <td data-label="Fecha / Hora" class="cita-fecha">
+        <strong>${escaparHtml(fecha)}</strong><br>
+        <span>${escaparHtml(cita.hora || "N/A")}</span>
+      </td>
+      <td data-label="Cliente">
+        <strong>${escaparHtml(cita.nombre || "N/A")}</strong>
+      </td>
+      <td data-label="Contacto">
+        <div class="cita-contacto">
+          ${
+            email
+              ? `<a href="${escaparHtml(emailHref)}">${escaparHtml(email)}</a>`
+              : "<span>Sin correo</span>"
+          }
+          ${
+            telefono
+              ? `<a href="${escaparHtml(telefonoHref)}">${escaparHtml(telefono)}</a>`
+              : "<span>Sin teléfono</span>"
+          }
+        </div>
+      </td>
+      <td data-label="Vehículo">${escaparHtml(cita.vehiculo || "N/A")}</td>
+      <td data-label="Mensaje">
+        <div class="cita-mensaje">
+          ${
+            mensajeCorto
+              ? escaparHtml(mensajeCorto)
+              : '<span class="cita-mensaje--vacio">Sin mensaje</span>'
+          }
+        </div>
+      </td>
+      <td data-label="Estado">
+        <span class="status-badge ${estado.clase}">${escaparHtml(estado.texto)}</span>
+      </td>
+      <td class="td-acciones">
+        <div class="actions-cell">
+          <button type="button" class="btn-action btn-view" title="Gestionar esta cita">
+            Gestionar
+          </button>
+        </div>
+      </td>
+    `;
+
+    fila
+      .querySelector(".btn-view")
+      .addEventListener("click", () => abrirModalCita(cita));
+
+    cuerpoTablaCitas.appendChild(fila);
+  });
+}
+
+function abrirModalCita(cita) {
+  if (!cita || !modalCita) return;
+
+  citaActual = cita;
+  const estado = infoEstadoCita(cita.estado);
+  const hoy = hoyEnCaracasAdmin();
+
+  if (modalCitaTitulo) {
+    modalCitaTitulo.textContent = `Cita de ${cita.nombre || "cliente"}`;
+  }
+  if (modalCitaSubtitulo) {
+    modalCitaSubtitulo.textContent = `${formatearFechaCita(cita.fecha)} a las ${
+      cita.hora || "N/A"
+    } · ID ${cita.id || "N/A"}`;
+  }
+  if (citaDetalleNombre) citaDetalleNombre.textContent = cita.nombre || "N/A";
+  if (citaDetalleEmail) citaDetalleEmail.textContent = cita.email || "N/A";
+  if (citaDetalleTelefono) {
+    citaDetalleTelefono.textContent = cita.telefono || "N/A";
+  }
+  if (citaDetalleVehiculo) {
+    citaDetalleVehiculo.textContent = cita.vehiculo || "N/A";
+  }
+  if (citaDetalleFecha) {
+    citaDetalleFecha.textContent = `${formatearFechaCita(cita.fecha)} a las ${
+      cita.hora || "N/A"
+    }`;
+  }
+  if (citaDetalleEstado) {
+    citaDetalleEstado.className = `status-badge ${estado.clase}`;
+    citaDetalleEstado.textContent = estado.texto;
+  }
+  if (citaDetalleMensaje) {
+    citaDetalleMensaje.textContent =
+      String(cita.mensaje || "").trim() || "Sin mensaje.";
+  }
+
+  if (citaGestionEstado) {
+    citaGestionEstado.value = ESTADOS_CITA[cita.estado]
+      ? cita.estado
+      : "pendiente";
+  }
+  if (citaGestionFecha) {
+    citaGestionFecha.value = cita.fecha || "";
+    citaGestionFecha.min = hoy;
+    citaGestionFecha.max = sumarDiasAdmin(hoy, 60);
+  }
+  if (citaGestionHora) {
+    const horas = [...HORAS_CITA];
+    if (cita.hora && !horas.includes(cita.hora)) horas.push(cita.hora);
+    citaGestionHora.innerHTML = horas
+      .map((hora) => `<option value="${hora}">${hora}</option>`)
+      .join("");
+    citaGestionHora.value = cita.hora || HORAS_CITA[0];
+  }
+  if (citaGestionNotas) {
+    citaGestionNotas.value = cita.notasAdmin || "";
+  }
+  if (citaGestionMensaje) {
+    citaGestionMensaje.hidden = true;
+    citaGestionMensaje.textContent = "";
+    citaGestionMensaje.className = "cita-gestion-mensaje";
+  }
+
+  modalCita.style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+
+function cerrarModalCita() {
+  if (modalCita) modalCita.style.display = "none";
+  document.body.style.overflow = "";
+  citaActual = null;
+}
+
+function mostrarMensajeCita(texto, tipo = "error") {
+  if (!citaGestionMensaje) return;
+  citaGestionMensaje.textContent = texto;
+  citaGestionMensaje.className = `cita-gestion-mensaje ${tipo}`;
+  citaGestionMensaje.hidden = false;
+}
+
+async function guardarCita(estadoForzado = null) {
+  if (!citaActual) return;
+  if (!citaActual.id) {
+    mostrarMensajeCita("No se encontró el ID de la cita.");
+    return;
+  }
+
+  const estado = estadoForzado || citaGestionEstado?.value || "";
+  const fecha = (citaGestionFecha?.value || "").trim();
+  const hora = (citaGestionHora?.value || "").trim();
+  const notasAdmin = (citaGestionNotas?.value || "").trim();
+
+  if (!ESTADOS_CITA[estado]) {
+    mostrarMensajeCita("Selecciona un estado válido.");
+    return;
+  }
+  if (!fecha) {
+    mostrarMensajeCita("Selecciona la fecha de la cita.");
+    citaGestionFecha?.focus();
+    return;
+  }
+  if (!hora) {
+    mostrarMensajeCita("Selecciona la hora de la cita.");
+    citaGestionHora?.focus();
+    return;
+  }
+
+  if (estado === "cancelada" && citaActual.estado !== "cancelada") {
+    const nombre = citaActual.nombre || "este cliente";
+    if (!confirm(`¿Cancelar la cita de ${nombre}?`)) return;
+  }
+
+  if (citaGestionEstado) citaGestionEstado.value = estado;
+
+  const botones = [btnCitaConfirmar, btnCitaCancelar, btnCitaGuardar];
+  botones.forEach((boton) => {
+    if (boton) boton.disabled = true;
+  });
+  if (citaGestionMensaje) citaGestionMensaje.hidden = true;
+
+  try {
+    const res = await fetch(`/api/citas/${citaActual.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ estado, fecha, hora, notasAdmin }),
+    });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      if (res.status === 401 || res.status === 403) {
+        mostrarMensajeCita(
+          "Tu sesión de administrador expiró. Vuelve a iniciar sesión.",
+        );
+      } else {
+        mostrarMensajeCita(
+          data.error || data.mensaje || "No se pudo actualizar la cita.",
+        );
+      }
+      return;
+    }
+
+    let mensaje = "Cita actualizada correctamente.";
+    if (data?.correo?.cliente === true) {
+      mensaje = "Cita actualizada y correo enviado al cliente.";
+    } else if (data?.correo?.cliente === false) {
+      mensaje =
+        "Cita actualizada, pero no se pudo enviar el correo al cliente. Revisa la configuración SMTP.";
+    }
+
+    cerrarModalCita();
+    await cargarCitas();
+    alert(mensaje);
+  } catch (error) {
+    console.error("Error al actualizar la cita:", error);
+    mostrarMensajeCita("No se pudo conectar con el servidor.");
+  } finally {
+    botones.forEach((boton) => {
+      if (boton) boton.disabled = false;
+    });
+  }
+}
+
+function limpiarFiltrosCitas() {
+  if (filtroCitaEstado) filtroCitaEstado.value = "";
+  if (filtroCitaFecha) filtroCitaFecha.value = "";
+  cargarCitas();
+}
+
+// ==========================================
+// 13. INICIALIZACIÓN Y EVENT LISTENERS
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
   // Cargar lista inicial de vehículos e inicializar marcas
@@ -1154,6 +1566,44 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         agregarMarca();
       }
+    });
+  }
+
+  // Gestión de citas
+  if (btnGestionarCitas) {
+    btnGestionarCitas.addEventListener("click", () => {
+      cargarCitas();
+      mostrarSeccionCitas();
+    });
+  }
+
+  if (btnVolverListaCitas) {
+    btnVolverListaCitas.addEventListener("click", () => {
+      mostrarSeccionLista();
+    });
+  }
+
+  if (filtroCitaEstado) {
+    filtroCitaEstado.addEventListener("change", () => {
+      cargarCitas();
+    });
+  }
+
+  if (filtroCitaFecha) {
+    filtroCitaFecha.addEventListener("change", () => {
+      cargarCitas();
+    });
+  }
+
+  if (btnActualizarCitas) {
+    btnActualizarCitas.addEventListener("click", () => {
+      cargarCitas();
+    });
+  }
+
+  if (btnLimpiarFiltrosCitas) {
+    btnLimpiarFiltrosCitas.addEventListener("click", () => {
+      limpiarFiltrosCitas();
     });
   }
 
@@ -1252,9 +1702,54 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Eventos del modal de citas
+  if (btnCerrarModalCita) {
+    btnCerrarModalCita.addEventListener("click", () => {
+      cerrarModalCita();
+    });
+  }
+
+  if (btnCerrarModalCitaPie) {
+    btnCerrarModalCitaPie.addEventListener("click", () => {
+      cerrarModalCita();
+    });
+  }
+
+  if (modalCita) {
+    modalCita.addEventListener("click", (e) => {
+      if (e.target === modalCita) {
+        cerrarModalCita();
+      }
+    });
+  }
+
+  if (btnCitaConfirmar) {
+    btnCitaConfirmar.addEventListener("click", () => {
+      guardarCita("confirmada");
+    });
+  }
+
+  if (btnCitaCancelar) {
+    btnCitaCancelar.addEventListener("click", () => {
+      guardarCita("cancelada");
+    });
+  }
+
+  if (btnCitaGuardar) {
+    btnCitaGuardar.addEventListener("click", () => {
+      guardarCita();
+    });
+  }
+
   document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+
+    if (modalCita && modalCita.style.display === "flex") {
+      cerrarModalCita();
+      return;
+    }
+
     if (
-      e.key === "Escape" &&
       modalDetalleVehiculo &&
       modalDetalleVehiculo.style.display === "flex"
     ) {

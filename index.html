@@ -15,7 +15,7 @@
             <li><a href="./contenedorPrincipal/vehiculos/listado.html">Vehículos</a></li>
             <li><a href="#marcas">Marcas</a></li>
             <li><a href="#quienes-somos">Quiénes Somos</a></li>
-            <li><a href="#contacto">Contacto</a></li>
+            <li><a href="#contacto">Cita</a></li>
         </ul>
         <div class="nav-auth">
             <a href="./contenedorPrincipal/registro/registro.html" id="btn-registro" class="btn-outline">Registro</a>
@@ -46,6 +46,8 @@
                         </div>
                     </div>
 
+                    <a href="./contenedorPrincipal/mis-citas/mis-citas.html" id="btn-mis-citas"
+                        class="perfil-enlace">Mis Citas</a>
                     <a href="./admin/admin.html" id="btn-admin" class="perfil-admin">Panel de Administración</a>
 
                     <button type="button" id="btn-cerrar-sesion" class="perfil-salir">Cerrar Sesión</button>
@@ -62,7 +64,7 @@
             <p class="hero-tagline">Tu próximo auto, sin complicaciones</p>
             <div class="hero-buttons">
                 <a href="#marcas" class="btn-primary">Ver Vehículos</a>
-                <a href="#contacto" class="btn-outline">Contactar</a>
+                <a href="#contacto" class="btn-outline">Agendar cita</a>
             </div>
         </div>
     </section>
@@ -206,30 +208,81 @@
 
     </main>
 
-    <!-- ZONA DE CONTACTO INTEGRADA -->
-    <h2 class="section-title reveal" id="contacto">Contactanos</h2>
+    <!-- AGENDA DE CITA -->
+    <h2 class="section-title reveal" id="contacto">Agenda tu cita</h2>
     <section id="zona-contacto" class="contacto-container">
         <div class="contacto-card reveal">
             <div class="contacto-info">
-                <h3>Zona de Contacto</h3>
-                <p>Contáctanos directamente por WhatsApp o Correo Electrónico con la información del vehículo de tu
-                    interés para coordinar tu atención.</p>
+                <h3>Elige el vehículo y el horario</h3>
+                <p>Agenda una cita para conocer el vehículo, resolver tus dudas y coordinar una prueba de manejo. Te
+                    confirmamos por correo o WhatsApp.</p>
+                <ul class="contacto-detalles">
+                    <li><strong>Horario:</strong> lunes a sábado, 9:00 a 17:00</li>
+                    <li><strong>Ubicación:</strong> Av. Principal de la Paz, diagonal a la estación de metro La Paz</li>
+                    <li><strong>Duración:</strong> una hora por cita</li>
+                </ul>
+                <p class="contacto-nota">¿Prefieres hablar ahora? Usa el botón de WhatsApp y te atendemos directo.</p>
             </div>
-            <div class="contacto-form">
+
+            <form id="form-cita" class="contacto-form" novalidate>
                 <div class="form-group">
-                    <input type="text" id="contacto-nombre" placeholder="Nombre completo" required>
+                    <label for="cita-nombre">Nombre completo</label>
+                    <input type="text" id="cita-nombre" name="nombre" placeholder="Tu nombre completo"
+                        autocomplete="name" maxlength="80" required>
                 </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cita-email">Correo electrónico</label>
+                        <input type="email" id="cita-email" name="email" placeholder="tu@correo.com"
+                            autocomplete="email" maxlength="120" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cita-telefono">Teléfono / WhatsApp</label>
+                        <input type="tel" id="cita-telefono" name="telefono" placeholder="+58 412 000 0000"
+                            autocomplete="tel" maxlength="30" required>
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <input type="text" id="contacto-telefono" placeholder="Número de teléfono o WhatsApp" required>
+                    <label for="cita-vehiculo">Vehículo de interés</label>
+                    <select id="cita-vehiculo" name="vehiculo" required>
+                        <option value="">Cargando vehículos...</option>
+                    </select>
+                    <input type="text" id="cita-vehiculo-otro" name="vehiculo_otro"
+                        placeholder="Escribe la marca y el modelo" maxlength="120" hidden>
                 </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cita-fecha">Fecha</label>
+                        <input type="date" id="cita-fecha" name="fecha" required>
+                    </div>
+                    <div class="form-group">
+                        <span class="form-label" id="cita-hora-label">Hora disponible</span>
+                        <div id="cita-horas" class="slots" aria-live="polite" aria-labelledby="cita-hora-label">
+                            <p class="slots-msg">Elige una fecha para ver los horarios.</p>
+                        </div>
+                        <input type="hidden" id="cita-hora" name="hora">
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <input type="text" id="contacto-vehiculo" placeholder="Vehículo de interés" required>
+                    <label for="cita-mensaje">Mensaje (opcional)</label>
+                    <textarea id="cita-mensaje" name="mensaje" rows="3" maxlength="500"
+                        placeholder="Cuéntanos si tienes algún detalle en particular."></textarea>
                 </div>
+
+                <p id="cita-estado" class="cita-estado" role="status" aria-live="polite" hidden></p>
+
                 <div class="contacto-botones">
-                    <button type="button" id="btn-enviar-whatsapp" class="btn-whatsapp">WhatsApp Directo</button>
-                    <button type="button" id="btn-enviar-correo" class="btn-correo">Enviar por Correo</button>
+                    <button type="submit" id="btn-agendar" class="btn-agendar">Solicitar cita</button>
+                    <button type="button" id="btn-enviar-whatsapp" class="btn-whatsapp">WhatsApp directo</button>
                 </div>
-            </div>
+
+                <p class="cita-legal">Al enviar, aceptas que Only Cars te contacte por correo o WhatsApp para
+                    confirmar la cita.</p>
+            </form>
         </div>
     </section>
 
@@ -251,7 +304,7 @@
                     class="social-icon" aria-label="Instagram" title="Instagram">
                     <img src="./img/icons8-instagram-50.png" alt="" width="50" height="50" decoding="async">
                 </a>
-                <a href="https://wa.me/584241667681" target="_blank" rel="noopener" class="social-icon"
+                <a href="https://wa.me/5491176456499" target="_blank" rel="noopener" class="social-icon"
                     aria-label="WhatsApp" title="WhatsApp">
                     <img src="./img/icons8-whatsapp-50.png" alt="" width="50" height="50" decoding="async">
                 </a>

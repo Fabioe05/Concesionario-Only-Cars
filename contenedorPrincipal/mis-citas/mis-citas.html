@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Citas | Only Cars</title>
+    <link rel="stylesheet" href="../../index.css">
+    <link rel="stylesheet" href="./mis-citas.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="../../index.html" class="logo">Only<span>Cars</span></a>
+        <ul class="nav-links">
+            <li><a href="../vehiculos/listado.html">Vehículos</a></li>
+            <li><a href="../../index.html#marcas">Marcas</a></li>
+            <li><a href="../../index.html#quienes-somos">Quiénes Somos</a></li>
+            <li><a href="../../index.html#contacto">Cita</a></li>
+        </ul>
+        <div class="nav-auth">
+            <a href="../registro/registro.html" id="btn-registro" class="btn-outline">Registro</a>
+            <a href="../login/login.html" id="btn-login" class="btn-outline">Login</a>
+            <div class="perfil" id="perfil">
+                <button type="button" id="btn-perfil" class="perfil-btn" aria-haspopup="true" aria-expanded="false"
+                    aria-label="Perfil de usuario">
+                    <span id="perfil-iniciales">?</span>
+                </button>
+
+                <div class="perfil-panel" id="perfil-panel" hidden>
+                    <div class="perfil-cabecera">
+                        <span class="perfil-avatar" id="perfil-avatar">?</span>
+                        <div class="perfil-titulo">
+                            <strong id="perfil-nombre">—</strong>
+                            <span class="perfil-rol" id="perfil-rol">—</span>
+                        </div>
+                    </div>
+
+                    <div class="perfil-datos">
+                        <div class="perfil-dato">
+                            <span class="perfil-etiqueta">Correo</span>
+                            <span id="perfil-correo">—</span>
+                        </div>
+                        <div class="perfil-dato">
+                            <span class="perfil-etiqueta">Registro</span>
+                            <span id="perfil-registro">—</span>
+                        </div>
+                    </div>
+
+                    <a href="./mis-citas.html" id="btn-mis-citas" class="perfil-enlace">Mis Citas</a>
+                    <a href="../../admin/admin.html" id="btn-admin" class="perfil-admin">Panel de Administración</a>
+
+                    <button type="button" id="btn-cerrar-sesion" class="perfil-salir">Cerrar Sesión</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mis-citas-main">
+        <div class="mis-citas-hero">
+            <div>
+                <h1 class="mis-citas-titulo">Mis Citas</h1>
+                <p class="mis-citas-subtitulo">
+                    Consulta el estado de tus solicitudes, la fecha, la hora y el vehículo que elegiste.
+                </p>
+            </div>
+            <a href="../../index.html#contacto" class="btn-primary">Agendar otra cita</a>
+        </div>
+
+        <div id="mis-citas-contenido" aria-live="polite">
+            <p class="msg-vacio">Cargando tus citas...</p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-info">
+                <img src="/img/logo.png" alt="Only Cars" class="footer-logo">
+                <p>Av. Principal de la Paz, diagonal a la estación de metro La Paz, Caracas, Venezuela</p>
+                <p>Desarrollado por <a href="https://github.com/Fabioe05/Concesionario-Only-Cars" target="_blank"
+                        rel="noopener">Fabio Espinoza</a></p>
+            </div>
+
+            <div class="footer-social">
+                <a href="https://github.com/Fabioe05/Concesionario-Only-Cars" target="_blank" rel="noopener"
+                    class="social-icon" aria-label="GitHub" title="GitHub">
+                    <img src="../../img/icons8-github-50.png" alt="" width="50" height="50" decoding="async">
+                </a>
+                <a href="https://www.instagram.com/onlycars2018/?hl=es" target="_blank" rel="noopener"
+                    class="social-icon" aria-label="Instagram" title="Instagram">
+                    <img src="../../img/icons8-instagram-50.png" alt="" width="50" height="50" decoding="async">
+                </a>
+                <a href="https://wa.me/5491176456499" target="_blank" rel="noopener" class="social-icon"
+                    aria-label="WhatsApp" title="WhatsApp">
+                    <img src="../../img/icons8-whatsapp-50.png" alt="" width="50" height="50" decoding="async">
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../../sesion.js"></script>
+    <script src="./mis-citas.js"></script>
+</body>
+
+</html>

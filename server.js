@@ -9,14 +9,19 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const { userExtractor, requiereSesionPagina } = require("./middlewares/auth");
 
 const vehiculosRouter = require("./controllers/vehiculos");
 const marcasRouter = require("./controllers/marcas");
 const authRouter = require("./controllers/auth");
 const imagenesRouter = require("./controllers/imagenes");
+const citasRouter = require("./controllers/citas");
 
 const app = express();
+
+// Render y la mayoría de hosts ponen la IP real en X-Forwarded-For.
+// Confiamos en un proxy para que req.ip sea la IP del cliente y el
+// límite de solicitudes del formulario de citas funcione por persona.
+app.set("trust proxy", 1);
 
 // --- Middlewares ---
 app.use(cors());
@@ -32,16 +37,7 @@ const RAIZ = __dirname;
 app.use("/img", express.static(path.join(RAIZ, "public", "img")));
 app.use("/uploads", express.static(path.join(RAIZ, "public", "uploads")));
 
-// Vistas del sitio: solo el login, el registro y su CSS son públicos.
-const PAGINAS_PUBLICAS = ["/login/", "/registro/", "/auth.css"];
-
-app.use("/contenedorPrincipal", (req, res, next) => {
-  if (PAGINAS_PUBLICAS.some((ruta) => req.path.startsWith(ruta))) {
-    return next();
-  }
-  return requiereSesionPagina(req, res, next);
-});
-
+// Vistas del sitio: públicas. La API protege las escrituras.
 app.use(
   "/contenedorPrincipal",
   express.static(path.join(RAIZ, "contenedorPrincipal"), {
@@ -49,40 +45,19 @@ app.use(
   }),
 );
 
-// Panel de administración: se queda como estaba (la API ya exige rol admin).
+// Panel de administración: la página es pública, la API exige rol admin.
 app.use("/admin", express.static(path.join(RAIZ, "admin")));
 
-// Portada: sin sesión se muestra la bienvenida pública; con sesión, la home.
-app.get(
-  ["/", "/index.html"],
-  (req, res, next) => {
-    if (!req.cookies?.accessToken) {
-      return res.redirect("/bienvenida.html");
-    }
-    return requiereSesionPagina(req, res, next);
-  },
-  (req, res) => {
-    res.sendFile(path.join(RAIZ, "index.html"), {
-      headers: { "Cache-Control": "no-store" },
-    });
-  },
-);
+// Portada pública.
+app.get(["/", "/index.html"], (req, res) => {
+  res.sendFile(path.join(RAIZ, "index.html"), {
+    headers: { "Cache-Control": "no-store" },
+  });
+});
 
-// Archivos sueltos públicos (los usa la bienvenida y el login).
-["index.css", "index.js", "sesion.js", "bienvenida.html", "bienvenida.css"].forEach(
-  (archivo) => {
-    app.get(`/${archivo}`, (req, res) => res.sendFile(path.join(RAIZ, archivo)));
-  },
-);
-
-// Toda la API exige sesión, salvo entrar, registrarse y cerrar sesión.
-const RUTAS_API_PUBLICAS = ["/auth/login", "/auth/register", "/auth/logout"];
-
-app.use("/api", (req, res, next) => {
-  if (RUTAS_API_PUBLICAS.some((ruta) => req.path.startsWith(ruta))) {
-    return next();
-  }
-  return userExtractor(req, res, next);
+// Archivos sueltos públicos (los usa el sitio y el login).
+["index.css", "index.js", "sesion.js"].forEach((archivo) => {
+  app.get(`/${archivo}`, (req, res) => res.sendFile(path.join(RAIZ, archivo)));
 });
 
 // --- Rutas de la API ---
@@ -90,6 +65,7 @@ app.use("/api/vehiculos", vehiculosRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/marcas", marcasRouter);
 app.use("/api/imagenes", imagenesRouter);
+app.use("/api/citas", citasRouter);
 
 // --- Manejo de errores de subida (multer responde HTML 500 por defecto) ---
 app.use((error, req, res, next) => {

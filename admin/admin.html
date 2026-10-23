@@ -24,6 +24,9 @@
                 <button type="button" id="btn-gestionar-marcas" class="btn-volver-inicio">
                     Gestionar Marcas
                 </button>
+                <button type="button" id="btn-gestionar-citas" class="btn-volver-inicio">
+                    Gestionar Citas
+                </button>
                 <button type="button" id="btn-crear-nuevo" class="btn-nuevo-vehiculo">
                     Crear Nuevo Vehículo
                 </button>
@@ -259,6 +262,69 @@
             </div>
         </section>
 
+        <!-- VISTA 4: GESTIÓN DE CITAS -->
+        <section id="seccion-citas">
+            <div class="form-header-bar">
+                <button type="button" id="btn-volver-lista-citas" class="btn-volver">
+                    ← Volver al Listado
+                </button>
+                <h2 class="form-titulo">Gestión de Citas</h2>
+            </div>
+
+            <div class="filtros-bar">
+                <div class="filtro-campo">
+                    <label for="filtro-cita-estado">Filtrar por Estado</label>
+                    <select id="filtro-cita-estado" class="filtro-select">
+                        <option value="">Todos los estados</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="confirmada">Confirmada</option>
+                        <option value="cancelada">Cancelada</option>
+                        <option value="completada">Completada</option>
+                    </select>
+                </div>
+                <div class="filtro-campo">
+                    <label for="filtro-cita-fecha">Filtrar por Fecha</label>
+                    <input type="date" id="filtro-cita-fecha" class="filtro-input">
+                </div>
+                <div class="filtro-acciones">
+                    <button type="button" id="btn-actualizar-citas" class="btn-limpiar-filtros">
+                        Actualizar
+                    </button>
+                    <button type="button" id="btn-limpiar-filtros-citas" class="btn-limpiar-filtros">
+                        Limpiar Filtros
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="vehiculos-table citas-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha / Hora</th>
+                            <th>Cliente</th>
+                            <th>Contacto</th>
+                            <th>Vehículo</th>
+                            <th>Mensaje</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-citas-body">
+                        <tr>
+                            <td colspan="7" class="tabla-mensaje">
+                                Cargando citas...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="cita-aviso">
+                Ojo: el correo al cliente depende de la configuración SMTP. Si falla, la cita se
+                guarda igual.
+            </p>
+        </section>
+
         <!-- MODAL: DETALLES DE VEHÍCULO -->
         <div id="modal-detalle-vehiculo" class="modal-overlay">
             <div class="modal-container">
@@ -281,6 +347,98 @@
                     <button type="button" id="btn-modal-eliminar"
                         class="btn-modal-action btn-modal-delete">Eliminar</button>
                     <button type="button" id="btn-modal-cerrar"
+                        class="btn-modal-action btn-modal-close-btn">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: GESTIONAR CITA -->
+        <div id="modal-cita" class="modal-overlay">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <div>
+                        <h2 id="modal-cita-titulo" class="modal-title">Gestionar Cita</h2>
+                        <span id="modal-cita-subtitulo" class="modal-subtitle">Datos de la solicitud</span>
+                    </div>
+                    <button type="button" id="btn-cerrar-modal-cita" class="btn-modal-close"
+                        title="Cerrar modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="detalle-grid">
+                        <div class="detalle-card">
+                            <span class="detalle-label">Cliente</span>
+                            <span id="cita-detalle-nombre" class="detalle-valor">N/A</span>
+                        </div>
+                        <div class="detalle-card">
+                            <span class="detalle-label">Correo</span>
+                            <span id="cita-detalle-email" class="detalle-valor">N/A</span>
+                        </div>
+                        <div class="detalle-card">
+                            <span class="detalle-label">Teléfono / WhatsApp</span>
+                            <span id="cita-detalle-telefono" class="detalle-valor">N/A</span>
+                        </div>
+                        <div class="detalle-card">
+                            <span class="detalle-label">Vehículo</span>
+                            <span id="cita-detalle-vehiculo" class="detalle-valor">N/A</span>
+                        </div>
+                        <div class="detalle-card">
+                            <span class="detalle-label">Fecha y hora</span>
+                            <span id="cita-detalle-fecha" class="detalle-valor">N/A</span>
+                        </div>
+                        <div class="detalle-card">
+                            <span class="detalle-label">Estado</span>
+                            <span id="cita-detalle-estado" class="status-badge">Pendiente</span>
+                        </div>
+                    </div>
+
+                    <div class="detalle-seccion-descripcion">
+                        <h4 class="detalle-seccion-titulo">Mensaje del cliente</h4>
+                        <div id="cita-detalle-mensaje" class="detalle-descripcion-texto">Sin mensaje.</div>
+                    </div>
+
+                    <div class="cita-gestion-grid">
+                        <div class="form-group">
+                            <label for="cita-gestion-estado">Estado</label>
+                            <select id="cita-gestion-estado">
+                                <option value="pendiente">Pendiente</option>
+                                <option value="confirmada">Confirmada</option>
+                                <option value="cancelada">Cancelada</option>
+                                <option value="completada">Completada</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="cita-gestion-fecha">Fecha</label>
+                            <input type="date" id="cita-gestion-fecha">
+                        </div>
+                        <div class="form-group">
+                            <label for="cita-gestion-hora">Hora</label>
+                            <select id="cita-gestion-hora"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cita-gestion-notas">Notas internas</label>
+                        <textarea id="cita-gestion-notas" rows="3" maxlength="500"
+                            placeholder="Ej: cliente confirmó por teléfono, prefiere prueba de manejo..."></textarea>
+                    </div>
+                    <p class="cita-gestion-ayuda">
+                        El cliente recibe un correo cuando cambias el estado o el horario.
+                        Las notas internas no se envían.
+                    </p>
+
+                    <p id="cita-gestion-mensaje" class="cita-gestion-mensaje" role="status" aria-live="polite"
+                        hidden></p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="btn-cita-cancelar"
+                        class="btn-modal-action btn-modal-delete">Cancelar cita</button>
+                    <button type="button" id="btn-cita-confirmar"
+                        class="btn-modal-action btn-modal-edit">Confirmar</button>
+                    <button type="button" id="btn-cita-guardar" class="btn-modal-action btn-modal-save">Guardar
+                        cambios</button>
+                    <button type="button" id="btn-cerrar-modal-cita-pie"
                         class="btn-modal-action btn-modal-close-btn">Cerrar</button>
                 </div>
             </div>

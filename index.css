@@ -44,7 +44,7 @@ html {
 
 /* Compensa el navbar sticky al saltar a un ancla */
 [id] {
-  scroll-margin-top: 90px;
+  scroll-margin-top: calc(var(--navbar-alto, 90px) + 10px);
 }
 
 /* 2. NAVBAR */
@@ -851,6 +851,32 @@ textarea {
   box-shadow: 0 6px 16px rgba(231, 76, 60, 0.45);
 }
 
+/* Enlace secundario del perfil: Mis Citas */
+.perfil-enlace {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  padding: 0.62rem 1rem;
+  background: transparent;
+  border: 1px solid rgba(231, 76, 60, 0.55);
+  border-radius: var(--radius);
+  color: var(--accent-red);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: all 0.25s ease;
+}
+
+.perfil-enlace:hover {
+  background: var(--accent-red);
+  border-color: var(--accent-red);
+  color: var(--blanco);
+  box-shadow: 0 6px 16px rgba(231, 76, 60, 0.35);
+}
+
 .perfil-salir {
   width: 100%;
   padding: 0.65rem 1rem;
@@ -908,9 +934,9 @@ textarea {
   border-radius: 14px;
   padding: 28px;
   width: 100%;
-  max-width: 820px;
+  max-width: 960px;
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
+  grid-template-columns: 0.85fr 1.35fr;
   gap: 26px;
   /* Sombra profunda combinada con un resplandor rojo sutil */
   box-shadow:
@@ -944,31 +970,189 @@ textarea {
   line-height: 1.6;
 }
 
+.contacto-detalles {
+  display: grid;
+  gap: 0.55rem;
+  margin: 1.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contacto-detalles li {
+  position: relative;
+  padding-left: 1rem;
+  color: #b8b8b8;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.contacto-detalles li::before {
+  content: "";
+  position: absolute;
+  top: 0.55em;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-red);
+}
+
+.contacto-detalles strong {
+  color: var(--text-primary);
+}
+
+.contacto-nota {
+  margin-top: 1.2rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.contacto-form {
+  color-scheme: dark;
+}
+
 .contacto-form .form-group {
   margin-bottom: 14px;
 }
 
-.contacto-form input {
+.contacto-form label,
+.contacto-form .form-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.contacto-form input,
+.contacto-form select,
+.contacto-form textarea {
   width: 100%;
   padding: 12px 14px;
   background-color: rgba(10, 10, 10, 0.8);
   border: 1px solid #333;
   border-radius: 8px;
   color: var(--blanco);
+  font-family: inherit;
   font-size: 0.92rem;
   transition: all 0.3s ease;
 }
 
-.contacto-form input:focus {
+.contacto-form input:focus,
+.contacto-form select:focus,
+.contacto-form textarea:focus {
   border-color: var(--accent-red);
-  /* Efecto de luz de neón roja al escribir */
   box-shadow: 0 0 15px rgba(231, 76, 60, 0.35);
   background-color: #121212;
   outline: none;
 }
 
-.contacto-form input::placeholder {
+.contacto-form input::placeholder,
+.contacto-form textarea::placeholder {
   color: #666;
+}
+
+.contacto-form textarea {
+  min-height: 86px;
+  resize: vertical;
+}
+
+.slots {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  min-height: 42px;
+}
+
+.slots-msg {
+  grid-column: 1 / -1;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.slot {
+  padding: 0.55rem 0.35rem;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: rgba(10, 10, 10, 0.8);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.slot:hover:not(:disabled) {
+  border-color: var(--accent-red);
+  background: rgba(231, 76, 60, 0.12);
+}
+
+.slot[aria-pressed="true"] {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--accent-red), var(--accent-red-hover));
+  color: var(--blanco);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.35);
+}
+
+.slot:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.slot-ocupado {
+  text-decoration: line-through;
+}
+
+.slot-pasado {
+  opacity: 0.28;
+}
+
+.cita-estado {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.cita-estado[hidden] {
+  display: none;
+}
+
+.cita-estado.exito {
+  color: #b7f7cf;
+  background: rgba(46, 204, 113, 0.12);
+  border-color: rgba(46, 204, 113, 0.35);
+}
+
+.cita-estado.error {
+  color: #ffb3ab;
+  background: rgba(231, 76, 60, 0.12);
+  border-color: rgba(231, 76, 60, 0.35);
+}
+
+.cita-estado.info {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border-color);
+}
+
+.cita-legal {
+  margin-top: 10px;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  line-height: 1.5;
 }
 
 .contacto-botones {
@@ -997,7 +1181,7 @@ textarea {
   background: linear-gradient(135deg, var(--verde-hover), var(--verde-activo));
 }
 
-.btn-correo {
+.btn-agendar {
   background: linear-gradient(135deg, var(--accent-red), var(--accent-red-hover));
   color: white;
   border: none;
@@ -1011,10 +1195,15 @@ textarea {
   box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
 }
 
-.btn-correo:hover {
+.btn-agendar:hover:not(:disabled) {
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(231, 76, 60, 0.5);
   background: linear-gradient(135deg, var(--accent-red-hover), #a93226);
+}
+
+.btn-agendar:disabled {
+  cursor: wait;
+  opacity: 0.65;
 }
 
 /* ==========================================
@@ -1270,9 +1459,20 @@ textarea {
     margin-bottom: 10px;
   }
 
-  .contacto-form input {
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .contacto-form input,
+  .contacto-form select,
+  .contacto-form textarea {
     padding: 9px 12px;
     font-size: 0.85rem;
+  }
+
+  .contacto-form textarea {
+    min-height: 76px;
   }
 
   .contacto-botones {
@@ -1281,7 +1481,7 @@ textarea {
   }
 
   .btn-whatsapp,
-  .btn-correo {
+  .btn-agendar {
     padding: 9px 12px;
     font-size: 0.8rem;
   }

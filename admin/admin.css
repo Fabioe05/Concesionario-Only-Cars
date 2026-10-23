@@ -55,7 +55,9 @@ body {
 /* VISTAS QUE EMPIEZAN OCULTAS (las muestra el JS al navegar) */
 #seccion-formulario,
 #seccion-marcas,
-#modal-detalle-vehiculo {
+#seccion-citas,
+#modal-detalle-vehiculo,
+#modal-cita {
   display: none;
 }
 
@@ -70,6 +72,7 @@ body {
 .admin-header,
 .form-header-bar {
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 20px;
   margin-bottom: 25px;
   padding-bottom: 18px;
@@ -159,6 +162,7 @@ label {
 .filtro-input,
 input[type="text"],
 input[type="number"],
+input[type="date"],
 select,
 textarea {
   width: 100%;
@@ -185,6 +189,9 @@ textarea {
   resize: vertical;
   min-height: 100px;
   border-radius: 6px;
+}
+input[type="date"] {
+  color-scheme: dark;
 }
 input[type="file"] {
   padding: 10px 0;
@@ -264,7 +271,8 @@ input[type="file"] {
 .btn-nuevo-vehiculo,
 .btn-primary,
 .btn-action.btn-delete,
-.btn-modal-delete {
+.btn-modal-delete,
+.btn-modal-save {
   background-color: var(--rojo);
   color: var(--blanco);
   border-color: var(--rojo);
@@ -278,7 +286,8 @@ input[type="file"] {
 .btn-nuevo-vehiculo:hover,
 .btn-primary:hover,
 .btn-action.btn-delete:hover,
-.btn-modal-delete:hover {
+.btn-modal-delete:hover,
+.btn-modal-save:hover {
   background-color: var(--rojo-hover);
   border-color: var(--rojo-hover);
   transform: translateY(-2px);
@@ -389,6 +398,11 @@ input[type="file"] {
 .filtro-buscar {
   flex: 2;
   min-width: 260px;
+}
+.filtro-acciones {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
 }
 
 /* TABLA DE VEHÍCULOS */
@@ -837,6 +851,131 @@ input[type="file"] {
   }
 }
 
+/* VISTA 4: GESTIÓN DE CITAS */
+#seccion-citas .vehiculos-table td {
+  vertical-align: top;
+}
+#seccion-citas .vehiculos-table th:last-child {
+  text-align: center;
+  min-width: 110px;
+}
+#seccion-citas .vehiculos-table td.td-acciones {
+  text-align: center;
+}
+#cita-detalle-estado {
+  align-self: flex-start;
+}
+.cita-fecha {
+  white-space: nowrap;
+}
+.cita-fecha span {
+  color: var(--gris-oscuro);
+  font-size: 12px;
+}
+.cita-contacto {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12px;
+  line-height: 1.35;
+  word-break: break-word;
+}
+.cita-contacto a {
+  color: var(--gris-claro);
+  text-decoration: none;
+}
+.cita-contacto a:hover {
+  color: var(--rojo);
+}
+.cita-mensaje {
+  max-width: 240px;
+  color: var(--gris);
+  font-size: 12.5px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+.cita-mensaje--vacio {
+  color: var(--gris-oscuro);
+  font-style: italic;
+}
+.cita-aviso {
+  margin-top: 12px;
+  color: var(--gris-oscuro);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.tabla-mensaje .btn-limpiar-filtros {
+  margin-top: 10px;
+  text-decoration: none;
+}
+
+/* Estados propios de una cita */
+.status-badge.pendiente {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid #f59e0b;
+}
+.status-badge.confirmada {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid #10b981;
+}
+.status-badge.cancelada {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid #ef4444;
+}
+.status-badge.completada {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid #3b82f6;
+}
+
+/* Formulario dentro del modal de citas */
+.cita-gestion-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.cita-gestion-ayuda {
+  margin: -8px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #8a8a95;
+}
+.cita-gestion-mensaje {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.cita-gestion-mensaje[hidden] {
+  display: none;
+}
+.cita-gestion-mensaje.error {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.45);
+}
+.cita-gestion-mensaje.exito {
+  color: #86efac;
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.45);
+}
+@media (max-width: 1200px) {
+  .cita-mensaje {
+    max-width: 100%;
+    text-align: right;
+  }
+}
+@media (max-width: 768px) {
+  .cita-gestion-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ANIMACIONES Y RESPONSIVE */
 @keyframes modalOverlayFadeIn {
   from {
@@ -1022,7 +1161,10 @@ input[type="file"] {
     min-width: 0;
     width: 100%;
   }
-  .filtro-acciones,
+  .filtro-acciones {
+    width: 100%;
+    flex-direction: column;
+  }
   .btn-limpiar-filtros {
     width: 100%;
   }
@@ -1034,6 +1176,7 @@ input[type="file"] {
   }
   input[type="text"],
   input[type="number"],
+  input[type="date"],
   select,
   textarea,
   .filtro-select,
@@ -1092,6 +1235,7 @@ input[type="file"] {
   }
   input[type="text"],
   input[type="number"],
+  input[type="date"],
   select,
   textarea,
   .filtro-select,

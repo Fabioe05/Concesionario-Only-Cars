@@ -1,12 +1,20 @@
 // ==========================================
 // 1. SELECTORES DEL DOM (Globales de la Landing)
 // ==========================================
-// Selectores para la zona de contacto
-const inputNombre = document.getElementById("contacto-nombre");
-const inputTelefono = document.getElementById("contacto-telefono");
-const inputVehiculo = document.getElementById("contacto-vehiculo");
+// Selectores para el formulario de citas
+const formCita = document.getElementById("form-cita");
+const inputNombre = document.getElementById("cita-nombre");
+const inputEmail = document.getElementById("cita-email");
+const inputTelefono = document.getElementById("cita-telefono");
+const selectVehiculo = document.getElementById("cita-vehiculo");
+const inputVehiculoOtro = document.getElementById("cita-vehiculo-otro");
+const inputFecha = document.getElementById("cita-fecha");
+const inputHora = document.getElementById("cita-hora");
+const contenedorHoras = document.getElementById("cita-horas");
+const inputMensaje = document.getElementById("cita-mensaje");
+const estadoCita = document.getElementById("cita-estado");
+const btnAgendar = document.getElementById("btn-agendar");
 const btnWhatsapp = document.getElementById("btn-enviar-whatsapp");
-const btnCorreo = document.getElementById("btn-enviar-correo");
 
 // Selectores para la sección de mejores ofertas
 const mejoresOfertas = document.getElementById("mejores-ofertas");
@@ -124,6 +132,7 @@ async function cargarDatosDeLaPortada() {
 
     renderizarMejoresOfertas(vehiculos);
     filtrarMarcasConStock(vehiculos);
+    cargarVehiculosEnFormulario(vehiculos);
   } catch (error) {
     console.error("Error al cargar los vehículos de la portada:", error);
     if (mejoresOfertas) {
@@ -132,6 +141,23 @@ async function cargarDatosDeLaPortada() {
     }
     // Si falla la conexión se dejan las 16 marcas tal cual:
     // es preferible eso a mostrar la sección de marcas vacía.
+    cargarVehiculosEnFormulario([]);
+  } finally {
+    // Al llegar desde el detalle del vehículo con #contacto, el navegador
+    // salta antes de que se pinten las ofertas y luego lanza su propio
+    // desplazamiento suave. Se corrige al terminar y se reafirma un momento
+    // después para que el título quede debajo del navbar.
+    if (window.location.hash === "#contacto") {
+      const irAlContacto = () => {
+        document.getElementById("contacto")?.scrollIntoView({
+          behavior: "instant",
+          block: "start",
+        });
+      };
+
+      requestAnimationFrame(irAlContacto);
+      setTimeout(irAlContacto, 700);
+    }
   }
 }
 
@@ -180,65 +206,488 @@ function ajustarAlturaHero() {
   const navbar = document.querySelector(".navbar");
   const hero = document.querySelector(".hero");
   if (!navbar || !hero) return;
+  document.documentElement.style.setProperty(
+    "--navbar-alto",
+    `${navbar.offsetHeight}px`,
+  );
   hero.style.setProperty("--hero-offset", `${navbar.offsetHeight}px`);
 }
 
-// --- SECCIÓN CONTACTO ---
-/**
- * Valida que los campos requeridos no estén vacíos antes de generar el mensaje.
- */
-function validarCamposContacto() {
-  if (
-    !inputNombre.value.trim() ||
-    !inputTelefono.value.trim() ||
-    !inputVehiculo.value.trim()
-  ) {
-    alert(
-      "Por favor, completa todos los campos (Nombre, Teléfono y Vehículo de interés).",
-    );
-    return false;
-  }
-  return true;
+// --- SECCIÓN CITA ---
+const MAX_DIAS_CITA = 60;
+
+function hoyEnCaracas() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Caracas",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
 }
 
-/**
- * Recopila los datos del formulario y abre WhatsApp con un mensaje prellenado.
- */
-function enviarPorWhatsApp() {
-  if (!validarCamposContacto()) return;
-
-  const nombre = inputNombre.value.trim();
-  const telefono = inputTelefono.value.trim();
-  const vehiculo = inputVehiculo.value.trim();
-  const numeroDestino = "+584241667681"; // Número de WhatsApp del concesionario
-
-  const textoMensaje = `Hola, mi nombre es ${nombre}. Mi teléfono es ${telefono} y estoy interesado(a) en el vehículo: ${vehiculo}.`;
-  const urlWhatsApp = `https://wa.me/${numeroDestino}?text=${encodeURIComponent(textoMensaje)}`;
-
-  window.open(urlWhatsApp, "_blank");
+function sumarDias(fecha, dias) {
+  const fechaBase = new Date(`${fecha}T12:00:00Z`);
+  fechaBase.setUTCDate(fechaBase.getUTCDate() + dias);
+  return fechaBase.toISOString().slice(0, 10);
 }
 
-/**
- * Recopila los datos y abre el cliente de correo prellenando el asunto y el cuerpo.
- */
-function enviarPorCorreo() {
-  if (!validarCamposContacto()) return;
+function esDomingo(fecha) {
+  return new Date(`${fecha}T12:00:00Z`).getUTCDay() === 0;
+}
 
-  const nombre = inputNombre.value.trim();
-  const telefono = inputTelefono.value.trim();
-  const vehiculo = inputVehiculo.value.trim();
-  const correoDestino = "fabio.enrique14@gmail.com";
+function configurarFechaCita() {
+  if (!inputFecha) return;
+  const hoy = hoyEnCaracas();
+  inputFecha.min = hoy;
+  inputFecha.max = sumarDias(hoy, MAX_DIAS_CITA);
+}
 
-  const asunto = encodeURIComponent(`Interés en vehículo: ${vehiculo}`);
-  const cuerpo = encodeURIComponent(
-    `Hola, me gustaría recibir más información.\n\n` +
-      `Nombre: ${nombre}\n` +
-      `Teléfono/WhatsApp: ${telefono}\n` +
-      `Vehículo de interés: ${vehiculo}`,
+function mostrarEstadoCita(mensaje, tipo = "info") {
+  if (!estadoCita) return;
+  estadoCita.textContent = mensaje;
+  estadoCita.className = `cita-estado ${tipo}`;
+  estadoCita.hidden = false;
+}
+
+function limpiarEstadoCita() {
+  if (!estadoCita) return;
+  estadoCita.hidden = true;
+  estadoCita.textContent = "";
+  estadoCita.className = "cita-estado";
+}
+
+function mostrarMensajeHoras(mensaje) {
+  if (!contenedorHoras) return;
+  contenedorHoras.innerHTML = "";
+
+  const parrafo = document.createElement("p");
+  parrafo.className = "slots-msg";
+  parrafo.textContent = mensaje;
+  contenedorHoras.appendChild(parrafo);
+
+  if (inputHora) inputHora.value = "";
+}
+
+function actualizarVehiculoOtro() {
+  if (!selectVehiculo || !inputVehiculoOtro) return;
+
+  const esOtro = selectVehiculo.value === "otro";
+  inputVehiculoOtro.hidden = !esOtro;
+  inputVehiculoOtro.required = esOtro;
+
+  if (!esOtro) inputVehiculoOtro.value = "";
+}
+
+function cargarVehiculosEnFormulario(vehiculos) {
+  if (!selectVehiculo) return;
+
+  const lista = [...(vehiculos || [])].sort((a, b) =>
+    `${a.marca || ""} ${a.modelo || ""}`.localeCompare(
+      `${b.marca || ""} ${b.modelo || ""}`,
+      "es",
+    ),
   );
 
-  const urlMailto = `mailto:${correoDestino}?subject=${asunto}&body=${cuerpo}`;
-  window.location.href = urlMailto;
+  selectVehiculo.innerHTML = "";
+
+  const inicial = document.createElement("option");
+  inicial.value = "";
+  inicial.textContent = lista.length
+    ? "Selecciona un vehículo"
+    : "No hay vehículos cargados";
+  selectVehiculo.appendChild(inicial);
+
+  lista.forEach((vehiculo) => {
+    const opcion = document.createElement("option");
+    const nombre =
+      `${vehiculo.marca || ""} ${vehiculo.modelo || ""} ${vehiculo.anio || ""}`.trim();
+    const estado = (vehiculo.status || "").toLowerCase();
+
+    opcion.value = vehiculo.id;
+    opcion.dataset.nombre = nombre;
+    opcion.textContent =
+      estado && estado !== "disponible"
+        ? `${nombre} · ${estado}`
+        : nombre;
+    selectVehiculo.appendChild(opcion);
+  });
+
+  const otro = document.createElement("option");
+  otro.value = "otro";
+  otro.textContent = "Otro vehículo / asesoría";
+  selectVehiculo.appendChild(otro);
+
+  const idUrl = new URLSearchParams(window.location.search).get("vehiculo");
+
+  if (idUrl && idUrl !== "undefined") {
+    let opcionUrl = [...selectVehiculo.options].find(
+      (opcion) => opcion.value === idUrl,
+    );
+
+    if (!opcionUrl) {
+      opcionUrl = document.createElement("option");
+      opcionUrl.value = idUrl;
+      opcionUrl.textContent = "Vehículo seleccionado";
+      selectVehiculo.appendChild(opcionUrl);
+    }
+
+    selectVehiculo.value = idUrl;
+  } else if (lista.length === 0) {
+    selectVehiculo.value = "otro";
+  }
+
+  actualizarVehiculoOtro();
+}
+
+function obtenerVehiculoSeleccionado() {
+  if (!selectVehiculo) return { id: null, texto: "" };
+
+  if (selectVehiculo.value === "otro") {
+    return {
+      id: null,
+      texto: (inputVehiculoOtro?.value || "").trim(),
+    };
+  }
+
+  if (!selectVehiculo.value) return { id: null, texto: "" };
+
+  const opcion = selectVehiculo.selectedOptions[0];
+  return {
+    id: selectVehiculo.value,
+    texto: opcion?.dataset.nombre || opcion?.textContent.trim() || "",
+  };
+}
+
+function seleccionarHora(boton) {
+  if (!contenedorHoras) return;
+
+  contenedorHoras
+    .querySelectorAll(".slot[aria-pressed='true']")
+    .forEach((otro) => otro.setAttribute("aria-pressed", "false"));
+
+  boton.setAttribute("aria-pressed", "true");
+  if (inputHora) inputHora.value = boton.dataset.hora || "";
+  limpiarEstadoCita();
+}
+
+async function cargarDisponibilidad(fecha) {
+  if (!contenedorHoras) return;
+
+  if (!fecha) {
+    mostrarMensajeHoras("Elige una fecha para ver los horarios.");
+    return;
+  }
+
+  if (esDomingo(fecha)) {
+    mostrarMensajeHoras("No atendemos los domingos. Elige otro día.");
+    return;
+  }
+
+  mostrarMensajeHoras("Cargando horarios...");
+
+  try {
+    const respuesta = await fetch(
+      `/api/citas/disponibilidad?fecha=${encodeURIComponent(fecha)}`,
+    );
+    const datos = await respuesta.json().catch(() => ({}));
+
+    if (!respuesta.ok) {
+      mostrarMensajeHoras(
+        datos.error || "No se pudieron cargar los horarios.",
+      );
+      return;
+    }
+
+    const ocupadas = new Set(datos.ocupadas || []);
+    const disponibles = new Set(datos.disponibles || []);
+
+    contenedorHoras.innerHTML = "";
+
+    (datos.horas || []).forEach((hora) => {
+      const boton = document.createElement("button");
+      boton.type = "button";
+      boton.className = "slot";
+      boton.dataset.hora = hora;
+      boton.textContent = hora;
+      boton.setAttribute("aria-pressed", "false");
+
+      if (ocupadas.has(hora)) {
+        boton.disabled = true;
+        boton.classList.add("slot-ocupado");
+        boton.title = "Horario ocupado";
+      } else if (!disponibles.has(hora)) {
+        boton.disabled = true;
+        boton.classList.add("slot-pasado");
+        boton.title = "Horario no disponible";
+      } else {
+        boton.addEventListener("click", () => seleccionarHora(boton));
+      }
+
+      contenedorHoras.appendChild(boton);
+    });
+
+    if (!(datos.disponibles || []).length) {
+      const aviso = document.createElement("p");
+      aviso.className = "slots-msg";
+      aviso.textContent =
+        "No quedan horarios disponibles para este día. Prueba otra fecha.";
+      contenedorHoras.appendChild(aviso);
+    }
+  } catch (error) {
+    console.error("Error al cargar la disponibilidad:", error);
+    mostrarMensajeHoras(
+      "No se pudieron cargar los horarios. Intenta de nuevo.",
+    );
+  }
+}
+
+function validarFormularioCita() {
+  const nombre = (inputNombre?.value || "").trim();
+  const email = (inputEmail?.value || "").trim();
+  const telefono = (inputTelefono?.value || "").trim();
+  const fecha = (inputFecha?.value || "").trim();
+  const hora = (inputHora?.value || "").trim();
+  const mensaje = (inputMensaje?.value || "").trim();
+
+  if (nombre.length < 2) {
+    mostrarEstadoCita("Escribe tu nombre completo.", "error");
+    inputNombre?.focus();
+    return null;
+  }
+
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    mostrarEstadoCita("Escribe un correo válido.", "error");
+    inputEmail?.focus();
+    return null;
+  }
+
+  if (!/^[+()\d\s.-]{7,30}$/.test(telefono)) {
+    mostrarEstadoCita("Escribe un teléfono válido.", "error");
+    inputTelefono?.focus();
+    return null;
+  }
+
+  const vehiculo = obtenerVehiculoSeleccionado();
+
+  if (!vehiculo.id && !vehiculo.texto) {
+    mostrarEstadoCita(
+      "Selecciona un vehículo o escribe cuál te interesa.",
+      "error",
+    );
+
+    if (selectVehiculo?.value === "otro") {
+      inputVehiculoOtro?.focus();
+    } else {
+      selectVehiculo?.focus();
+    }
+
+    return null;
+  }
+
+  if (!fecha) {
+    mostrarEstadoCita("Elige la fecha de la cita.", "error");
+    inputFecha?.focus();
+    return null;
+  }
+
+  if (esDomingo(fecha)) {
+    mostrarEstadoCita(
+      "No atendemos los domingos. Elige otro día.",
+      "error",
+    );
+    inputFecha?.focus();
+    return null;
+  }
+
+  const hoy = hoyEnCaracas();
+  if (fecha < hoy || fecha > sumarDias(hoy, MAX_DIAS_CITA)) {
+    mostrarEstadoCita(
+      `Elige una fecha entre hoy y ${MAX_DIAS_CITA} días.`,
+      "error",
+    );
+    inputFecha?.focus();
+    return null;
+  }
+
+  if (!hora) {
+    mostrarEstadoCita(
+      "Selecciona un horario disponible.",
+      "error",
+    );
+    contenedorHoras?.querySelector(".slot:not(:disabled)")?.focus();
+    return null;
+  }
+
+  return {
+    nombre,
+    email,
+    telefono,
+    fecha,
+    hora,
+    mensaje,
+    vehiculo,
+  };
+}
+
+async function manejarEnvioCita(evento) {
+  evento.preventDefault();
+
+  const datos = validarFormularioCita();
+  if (!datos) return;
+
+  if (btnAgendar) {
+    btnAgendar.disabled = true;
+    btnAgendar.textContent = "Enviando...";
+  }
+
+  const payload = {
+    nombre: datos.nombre,
+    email: datos.email,
+    telefono: datos.telefono,
+    fecha: datos.fecha,
+    hora: datos.hora,
+    mensaje: datos.mensaje,
+  };
+
+  if (datos.vehiculo.id) {
+    payload.vehiculo_id = datos.vehiculo.id;
+  } else {
+    payload.vehiculo = datos.vehiculo.texto;
+  }
+
+  try {
+    const respuesta = await fetch("/api/citas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const resultado = await respuesta.json().catch(() => ({}));
+
+    if (!respuesta.ok) {
+      mostrarEstadoCita(
+        resultado.error ||
+          "No se pudo registrar la cita. Intenta de nuevo.",
+        "error",
+      );
+
+      if (respuesta.status === 409 && inputFecha?.value) {
+        await cargarDisponibilidad(inputFecha.value);
+      }
+
+      return;
+    }
+
+    const avisoCorreo =
+      resultado.correo?.cliente === false
+        ? " No pudimos enviarte el correo de confirmación, pero la cita quedó registrada."
+        : "";
+
+    mostrarEstadoCita(
+      `${resultado.mensaje || "Solicitud enviada. Te contactaremos para confirmar."}${avisoCorreo}`,
+      "exito",
+    );
+
+    formCita?.reset();
+    if (selectVehiculo) selectVehiculo.value = "";
+    actualizarVehiculoOtro();
+    mostrarMensajeHoras("Elige una fecha para ver los horarios.");
+  } catch (error) {
+    console.error("Error al registrar la cita:", error);
+    mostrarEstadoCita(
+      "No se pudo conectar con el servidor. Revisa tu conexión e intenta de nuevo.",
+      "error",
+    );
+  } finally {
+    if (btnAgendar) {
+      btnAgendar.disabled = false;
+      btnAgendar.textContent = "Solicitar cita";
+    }
+  }
+}
+
+function enviarPorWhatsApp() {
+  const nombre = (inputNombre?.value || "").trim();
+  const vehiculo = obtenerVehiculoSeleccionado().texto;
+  const fecha = (inputFecha?.value || "").trim();
+  const hora = (inputHora?.value || "").trim();
+
+  let texto = "Hola, quiero agendar una cita en Only Cars.";
+  if (nombre) texto += ` Soy ${nombre}.`;
+  if (vehiculo) texto += ` Me interesa el vehículo ${vehiculo}.`;
+  if (fecha) texto += ` Fecha: ${fecha}.`;
+  if (hora) texto += ` Hora: ${hora}.`;
+
+  window.open(
+    `https://wa.me/5491176456499?text=${encodeURIComponent(texto)}`,
+    "_blank",
+    "noopener,noreferrer",
+  );
+}
+
+async function prefillDatosUsuario() {
+  // La cookie de sesión puede seguir viva aunque localStorage se haya borrado.
+  // Por eso consultamos /me siempre; un 401 solo significa que es invitado.
+  try {
+    const respuesta = await fetch("/api/auth/me");
+    if (!respuesta.ok) return;
+
+    const datos = await respuesta.json();
+
+    if (inputNombre && !inputNombre.value) {
+      inputNombre.value = datos.name || "";
+    }
+
+    if (inputEmail && !inputEmail.value) {
+      inputEmail.value = datos.email || "";
+    }
+  } catch (error) {
+    // Es un visitante sin sesión: no hay nada que rellenar.
+  }
+}
+
+function configurarEventosCita() {
+  if (formCita) {
+    formCita.addEventListener("submit", manejarEnvioCita);
+  }
+
+  if (inputFecha) {
+    inputFecha.addEventListener("change", () => {
+      limpiarEstadoCita();
+
+      const fecha = inputFecha.value;
+      if (!fecha) {
+        mostrarMensajeHoras("Elige una fecha para ver los horarios.");
+        return;
+      }
+
+      if (esDomingo(fecha)) {
+        mostrarEstadoCita(
+          "No atendemos los domingos. Elige otro día.",
+          "error",
+        );
+        mostrarMensajeHoras("Elige otro día para ver los horarios.");
+        return;
+      }
+
+      cargarDisponibilidad(fecha);
+    });
+  }
+
+  if (selectVehiculo) {
+    selectVehiculo.addEventListener("change", () => {
+      actualizarVehiculoOtro();
+      limpiarEstadoCita();
+    });
+  }
+
+  if (btnWhatsapp) {
+    btnWhatsapp.addEventListener("click", enviarPorWhatsApp);
+  }
+
+  [inputNombre, inputEmail, inputTelefono, inputMensaje].forEach((campo) => {
+    campo?.addEventListener("input", limpiarEstadoCita);
+  });
 }
 
 // ==========================================
@@ -252,15 +701,12 @@ document.addEventListener("DOMContentLoaded", () => {
   ajustarAlturaHero();
   window.addEventListener("resize", ajustarAlturaHero);
 
-  // Cargar los vehículos de la portada (ofertas + marcas con stock)
+  // Preparar el formulario de citas
+  configurarFechaCita();
+  mostrarMensajeHoras("Elige una fecha para ver los horarios.");
+  configurarEventosCita();
+  prefillDatosUsuario();
+
+  // Cargar los vehículos de la portada (ofertas, marcas y formulario)
   cargarDatosDeLaPortada();
-
-  // Activar los eventos de los botones de contacto
-  if (btnWhatsapp) {
-    btnWhatsapp.addEventListener("click", enviarPorWhatsApp);
-  }
-
-  if (btnCorreo) {
-    btnCorreo.addEventListener("click", enviarPorCorreo);
-  }
 });

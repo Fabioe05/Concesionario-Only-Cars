@@ -25,24 +25,25 @@ const requireAdmin = (request, response, next) => {
   next();
 };
 
-// Para páginas HTML: si no hay sesión, redirige al login guardando el destino.
-// No consulta la base de datos: solo comprueba que el token esté firmado.
-const requiereSesionPagina = (request, response, next) => {
+// Para rutas públicas que quieren saber si hay sesión, sin bloquear al invitado.
+// Si el token no existe o no es válido, se continúa como visitante.
+const usuarioOpcional = async (request, response, next) => {
   const token = request.cookies?.accessToken;
-  const login = "/contenedorPrincipal/login/login.html";
-  const destino = encodeURIComponent(request.originalUrl);
 
   if (!token) {
-    return response.redirect(`${login}?redirect=${destino}`);
+    request.user = null;
+    return next();
   }
 
   try {
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    response.set("Cache-Control", "no-store");
-    return next();
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const user = await User.findById(decoded.id);
+    request.user = user && user.active !== false ? user : null;
   } catch (error) {
-    return response.redirect(`${login}?redirect=${destino}`);
+    request.user = null;
   }
+
+  next();
 };
 
-module.exports = { userExtractor, requireAdmin, requiereSesionPagina };
+module.exports = { userExtractor, requireAdmin, usuarioOpcional };

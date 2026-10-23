@@ -7,6 +7,7 @@ const dueñosVehiculo = document.getElementById("vehicle-owners");
 const añoVehiculo = document.getElementById("vehicle-year");
 const descripcionVehiculo = document.getElementById("vehicle-description");
 const precioVehiculo = document.getElementById("vehicle-price");
+const btnContactarVehiculo = document.getElementById("btn-contactar-vehiculo");
 
 // Selectores de la Galería
 const imagenPrincipal = document.getElementById("main-image");
@@ -30,6 +31,11 @@ function obtenerIdDeUrl() {
 function renderizarVehiculo(vehiculo) {
   tituloVehiculo.textContent =
     `${vehiculo.marca || ""} ${vehiculo.modelo}`.trim();
+
+  if (btnContactarVehiculo && vehiculo.id) {
+    btnContactarVehiculo.href = `../../index.html?vehiculo=${encodeURIComponent(vehiculo.id)}#contacto`;
+  }
+
   motorVehiculo.textContent = vehiculo.motor || "N/A";
   estatusVehiculo.textContent = vehiculo.status || "N/A";
   transmisionVehiculo.textContent = vehiculo.transmision || "N/A";
